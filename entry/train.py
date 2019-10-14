@@ -46,6 +46,5 @@ for page in pages:
       if l!=p:
         print '!',
       print l,p,' | '.join(f).encode('utf8')
-
 print confusion_matrix(true,pred)
 print classification_report(true,pred)

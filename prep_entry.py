@@ -28,12 +28,17 @@ for i in range(310):
       prev_base=0
       prev_page_id=page_id
     if float(token.attrib['base'])!=prev_base:
-      labels.append('NEWLINE')
-      feats.append(['NEWLINE'])
+      #labels.append('NEWLINE')
+      #feats.append(['NEWLINE'])
+      newline=True
       prev_base=float(token.attrib['base'])
+    else:
+      newline=False
     if token.text==None:
       token.text=''
     feat=['SIZE='+token.attrib['font-size'],'BOLD='+token.attrib['bold'],'ITALIC='+token.attrib['italic'],'FONT='+token.attrib['font-name'],'TOKEN='+token.text]
+    if newline:
+      feat.append('NEWLINE')
     if idx==0:
       label='START'
     elif idx+1==len(tokens):
