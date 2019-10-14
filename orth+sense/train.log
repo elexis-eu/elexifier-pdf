@@ -661,11 +661,11 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOK
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=adorned
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=the | NEWLINE
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=walls.
-! SENSE_START SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=adornment
+! SENSE_INSIDE SENSE_START SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=adornment
 SENSE_INSIDE SENSE_INSIDE SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=/6dÕÂnm6
 SENSE_INSIDE SENSE_INSIDE SIZE=4.79 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=2 | NEWLINE
 SENSE_INSIDE SENSE_INSIDE SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=nt/ | NEWLINE
-! SENSE_INSIDE SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=COUNT
+! SENSE_START SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=COUNT
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=N
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=or
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=UNCOUNT
@@ -691,7 +691,7 @@ O O SIZE=4.79 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=3 | NEWLINE
 O O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=dren6lËn/; | NEWLINE
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pi{emo
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=tudi
-! ORTH O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=adrenaline.
+! O ORTH SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=adrenaline.
 SENSE_START SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=UNCOUNT
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=N | NEWLINE
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssexcelsior | TOKEN=Adrenalin
@@ -826,7 +826,7 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOK
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=have
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=equal | NEWLINE
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=rights.
-! SENSE_INSIDE SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ATTRIB
+! SENSE_START SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ATTRIB
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ADJ
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=…adult
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=insects.
@@ -1254,7 +1254,7 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOK
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=ease
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=of
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=distribution.
-! SENSE_START SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=Kadar | NEWLINE
+! SENSE_INSIDE SENSE_START SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=Kadar | NEWLINE
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=je
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=nekaj
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssexcelsior | TOKEN=to
@@ -1949,7 +1949,7 @@ O O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=dvaËz6/, | NEWLI
 O O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=advisers;
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pi{emo
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=tudi
-! ORTH O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=advisor.
+! O ORTH SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=advisor.
 SENSE_START SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=COUNT
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=N | NEWLINE
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssexcelsior | TOKEN=An
@@ -2026,9 +2026,9 @@ O O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=advocating,
 O O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=advocated;
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=glagol
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=izgo-
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=varjamo | NEWLINE
-! O SENSE_INSIDE SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=/ædv6
-! O SENSE_INSIDE SIZE=4.79 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=6 | NEWLINE
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=varjamo | NEWLINE
+! SENSE_INSIDE O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=/ædv6
+! SENSE_INSIDE O SIZE=4.79 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=6 | NEWLINE
 O O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=keËt/, | NEWLINE
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=samostalnik
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pa
@@ -2274,8 +2274,8 @@ O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=v
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ameri{ki
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=angle{~ini
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pi{emo
-! ORTH O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=esthet-
-! ORTH SENSE_START SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=ic. | NEWLINE
+! O ORTH SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=esthet-
+! SENSE_START ORTH SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=ic. | NEWLINE
 SENSE_START SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ADJ
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=Kar
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=je
@@ -3245,12 +3245,12 @@ O O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=/ÊÂft6w6dz/.
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=Uporabljamo
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=tudi
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=zapis
-! ORTH O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=after-
-! ORTH SENSE_START SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=ward, | NEWLINE
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=zlasti
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=v
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ameri{ki
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=angle{~ini.
+! O ORTH SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=after-
+! SENSE_START ORTH SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=ward, | NEWLINE
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=zlasti
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=v
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ameri{ki
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=angle{~ini.
 SENSE_START SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=SENTENCE
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ADV
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=Kadar
@@ -3501,7 +3501,7 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOK
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=had
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=aged
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=him.
-! SENSE_START SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=ageing
+! SENSE_INSIDE SENSE_START SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=ageing
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ADJ
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=…an
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=ageing
@@ -3561,7 +3561,7 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOK
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=him
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=for
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=ages.
-! SENSE_START SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=^lovek, | NEWLINE
+! SENSE_INSIDE SENSE_START SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=^lovek, | NEWLINE
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ki
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=je
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssexcelsior | TOKEN=under
@@ -3604,17 +3604,17 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKE
 ORTH ORTH SIZE=9 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=aged; | NEWLINE | BOS
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pri
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=1.
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pomenu
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=besedo
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=izgovarjamo
-! O SENSE_INSIDE SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=/eËdÇd/,
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pri
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=2.
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=in
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=3. | NEWLINE
-! O SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pa
-! O SENSE_INSIDE SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=/eËdÇË
-! O SENSE_INSIDE SIZE=4.79 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=2 | NEWLINE
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pomenu
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=besedo
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=izgovarjamo
+! SENSE_INSIDE O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=/eËdÇd/,
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pri
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=2.
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=in
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=3. | NEWLINE
+! SENSE_INSIDE O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pa
+! SENSE_INSIDE O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=/eËdÇË
+! SENSE_INSIDE O SIZE=4.79 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=2 | NEWLINE
 O O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=d/. | NEWLINE
 SENSE_START SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=PRED
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ADJ
@@ -3642,7 +3642,7 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOK
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=Glej
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=tudi
 SENSE_INSIDE SENSE_INSIDE SIZE=6 | BOLD=yes | ITALIC=no | FONT=ssexcelsior | TOKEN=MIDDLE-AGED.
-! SENSE_START SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ADJ | NEWLINE
+! SENSE_INSIDE SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ADJ | NEWLINE
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=Kadar
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=je
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=nekdo
@@ -4068,7 +4068,7 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKE
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=biti
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=bistre
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=glave;
-! SENSE_START SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=agility
+! SENSE_INSIDE SENSE_START SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=agility
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=UNCOUNT
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=N
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=…tests | NEWLINE
@@ -4143,7 +4143,7 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOK
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=agitate
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=him
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=unduly.
-! SENSE_START SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=agi-
+! SENSE_INSIDE SENSE_START SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=agi-
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=tated | NEWLINE
 SENSE_INSIDE SENSE_INSIDE SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=/ædÇËteËtË
 SENSE_INSIDE SENSE_INSIDE SIZE=4.79 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=2 | NEWLINE
@@ -4155,7 +4155,7 @@ SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOK
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=and
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=agi-
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=tated. | NEWLINE
-! SENSE_INSIDE SENSE_START SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=agitation
+! SENSE_START SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssunivers | TOKEN=agitation
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=UNCOUNT
 SENSE_INSIDE SENSE_INSIDE SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=N
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=yes | FONT=ssexcelsior | TOKEN=I
@@ -4276,7 +4276,7 @@ O O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=agonizing,
 O O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=agonized;
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pi{emo
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=tudi | NEWLINE
-! ORTH O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=agonise.
+! O ORTH SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=agonise.
 SENSE_START SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=VB
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssexcelsior | TOKEN=To
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssexcelsior | TOKEN=agonize
@@ -4306,7 +4306,7 @@ O O SIZE=4.79 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=7 | NEWLINE
 O O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=naËzd/; | NEWLINE
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pi{emo
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=tudi
-! ORTH O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=agonised.
+! O ORTH SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=agonised.
 SENSE_START SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ADJ
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=Beseda
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=yes | ITALIC=no | FONT=ssexcelsior | TOKEN=agonized | NEWLINE
@@ -4333,7 +4333,7 @@ O O SIZE=4.79 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=7 | NEWLINE
 O O SIZE=7.25 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=naËzËÏ/; | NEWLINE
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=pi{emo
 O O SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=tudi
-! ORTH O SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=agonising.
+! O ORTH SIZE=7.5 | BOLD=no | ITALIC=no | FONT=ssunivers | TOKEN=agonising.
 SENSE_START SENSE_START SIZE=5.5 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=ADJ
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=Kar
 SENSE_INSIDE SENSE_INSIDE SIZE=8 | BOLD=no | ITALIC=no | FONT=ssexcelsior | TOKEN=je | NEWLINE

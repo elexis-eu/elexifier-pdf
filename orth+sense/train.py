@@ -26,7 +26,7 @@ true=[]
 pred=[]
 import json
 trainer=pycrfsuite.Trainer(algorithm='pa',verbose=False)
-trainer.set_params({'max_iterations':20})
+trainer.set_params({'max_iterations':40})
 pages=json.load(open('train.json'))
 for page in pages[:int(len(pages)*args.percentage)]:
   labels,feats=page
@@ -45,7 +45,7 @@ for page in pages:
     for f,l,p in zip(feats,labels,pred_labels):
       if p!=l:
         print '!',
-      print l,p,' | '.join(f).encode('utf8')
+      print p,l,' | '.join(f).encode('utf8')
 
 print confusion_matrix(true,pred)
 print classification_report(true,pred)

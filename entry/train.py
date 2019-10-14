@@ -45,6 +45,6 @@ for page in pages:
     for f,l,p in zip(feats,labels,pred_labels):
       if l!=p:
         print '!',
-      print l,p,' | '.join(f).encode('utf8')
+      print p,l,' | '.join(f).encode('utf8')
 print confusion_matrix(true,pred)
 print classification_report(true,pred)
