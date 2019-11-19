@@ -15,6 +15,7 @@ from funcs import extract_tokens, one_hot_and_chars, one_hot_target
 parser=argparse.ArgumentParser()
 parser.add_argument('-p', '--percentage', help='percentage of the training data to be used', type=float, default=1.0)
 parser.add_argument('-v', '--verbose', action='store_true')
+parser.add_argument('-nr', '--n_rounds', help='number of repetitions of 10 epoch training', type=int, default=10)
 parser.add_argument('-ld', '--logdir', help='directory where the log file will be stored', type=str, default="")
 args = parser.parse_args()
 
@@ -89,8 +90,7 @@ print(model.summary())
 
 print(model.summary())
 t1 = time()
-n_rounds=10
-for i_round in range(n_rounds):
+for i_round in range(args.n_rounds):
   print('ROUND', i_round)
   t_r0 = time()
   model.fit([x_train_oh, x_train_chars], y_train_oh, batch_size=5, epochs=10, validation_data=([x_test_oh, x_test_chars], y_test_oh), shuffle=True)
