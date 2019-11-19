@@ -2,13 +2,13 @@ import json
 import numpy as np
 from keras.preprocessing import sequence
 from keras.models import Model
-from keras.layers import Input, Masking, Dense, Bidirectional, LSTM, TimeDistributed, Concatenate
+from keras.layers import Input, Masking, Dense, Bidirectional, LSTM, TimeDistributed, Concatenate, Embedding, Dropout
 import argparse
 from datetime import datetime
 from time import time
 import os
 
-from funcs import extract_tokens, one_hot_and_chars, one_hot_target
+from funcs import extract_tokens, one_hot_and_tokens, one_hot_target
 
 
 
@@ -37,29 +37,19 @@ y_test = [e[1] for e in test]
 
 
 all_tokens, idx_t, idx_c = extract_tokens(x_train)
-x_train_oh, x_train_chars, idx = one_hot_and_chars(x_train, idx_c=idx_c)
-x_test_oh, x_test_chars, _ = one_hot_and_chars(x_test, idx, idx_c)
+x_train_oh, x_train_tokens, idx = one_hot_and_tokens(x_train, idx_t=idx_t)
+x_test_oh, x_test_tokens, _ = one_hot_and_tokens(x_test, idx, idx_t)
 
 max_sequence_len=max([len(e) for e in x_train_oh])*2
-x_train_oh=sequence.pad_sequences(x_train_oh,max_sequence_len)
-x_test_oh=sequence.pad_sequences(x_test_oh,max_sequence_len)
+x_train_oh = sequence.pad_sequences(x_train_oh,max_sequence_len)
+x_train_tokens = sequence.pad_sequences(x_train_tokens, max_sequence_len)
+x_test_oh = sequence.pad_sequences(x_test_oh,max_sequence_len)
+x_test_tokens = sequence.pad_sequences(x_test_tokens, max_sequence_len)
 
-max_carray_len = 0
-for seq in x_train_chars:
-  max_cur = max([len(arr) for arr in seq])
-  if max_cur > max_carray_len:
-    max_carray_len = max_cur
-max_carray_len *= 2
-
-x_train_chars_pad = [sequence.pad_sequences(seq, max_carray_len) for seq in x_train_chars]
-x_train_chars = sequence.pad_sequences(x_train_chars_pad, max_sequence_len)
-x_test_chars_pad = [sequence.pad_sequences(seq, max_carray_len) for seq in x_test_chars]
-x_test_chars = sequence.pad_sequences(x_test_chars_pad, max_sequence_len)
-
-print("X_train_oh.shape", x_train_oh.shape)
-print("X_train_chars.shape", x_train_chars.shape)
-print("X_test_oh.shape", x_test_oh.shape)
-print("X_test_chars.shape", x_test_chars.shape)
+print("x_train_oh.shape", x_train_oh.shape)
+print("x_train_tokens.shape", x_train_tokens.shape)
+print("x_test_oh.shape", x_test_oh.shape)
+print("x_test_tokens.shape", x_test_tokens.shape)
 
 y_train_oh,idx_label=one_hot_target(y_train)
 y_test_oh,_=one_hot_target(y_test,idx_label)
@@ -71,30 +61,31 @@ rev_idx_label={v:k for k,v in idx_label.items()}
 t1 = time()
 print("Data preparation time:", (t1-t0), "s")
 
+# embedded tokens
+tokens_input = Input(shape=(max_sequence_len,))
 features_input = Input(shape=(max_sequence_len, len(idx)))
-chars_input = Input(shape=(max_sequence_len, max_carray_len))
-chars_masked = Masking(0) (chars_input)
+tokens_masked = Masking(0) (tokens_input)
 features_masked = Masking(0) (features_input)
-chars_embed = Bidirectional(LSTM(5, return_sequences=True)) (chars_masked)
-# chars_embed = Dropout(0.5) (chars_embed)
-features_merged = Concatenate(axis=-1) ([features_masked, chars_embed])
+tokens_embed = Embedding(int((2/3)*len(idx_t)), 10, input_length=max_sequence_len) (tokens_masked)
+# tokens_embed = Dropout(0.5) (tokens_embed)
+features_merged = Concatenate(axis=-1) ([features_masked, tokens_embed])
 
 h = Bidirectional(LSTM(12, return_sequences=True)) (features_merged)
 # h = Dropout(0.5) (h)
 y = TimeDistributed(Dense(len(idx_label), activation='softmax')) (h)
-model = Model(inputs=[features_input, chars_input], outputs=y)
+model = Model(inputs=[features_input, tokens_input], outputs=y)
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
-print(model.summary())
 
+print(model.summary())
 
 t1 = time()
 for i_round in range(args.n_rounds):
   print('ROUND', i_round)
   t_r0 = time()
-  model.fit([x_train_oh, x_train_chars], y_train_oh, batch_size=5, epochs=10, validation_data=([x_test_oh, x_test_chars], y_test_oh), shuffle=True)
-  score, acc = model.evaluate([x_test_oh, x_test_chars], y_test_oh, batch_size=50)
+  model.fit([x_train_oh, x_train_tokens], y_train_oh, batch_size=5, epochs=10, validation_data=([x_test_oh, x_test_tokens], y_test_oh), shuffle=True)
+  score, acc = model.evaluate([x_test_oh, x_test_tokens], y_test_oh, batch_size=50)
 
-  y_test_pred=model.predict([x_test_oh, x_test_chars])
+  y_test_pred=model.predict([x_test_oh, x_test_tokens])
 
   def to_tags(sequence):
     result=[]

@@ -59,6 +59,39 @@ def extract_tokens(dataset):
 
 
 
+def one_hot_and_tokens(dataset, idx={}, idx_t={}):
+  if len(idx)==0:
+    lexicon=set()
+    for sequence in dataset:
+      for instance in sequence:
+        for feature in instance:
+          if not feature.startswith('TOKEN'):
+            lexicon.add(feature)
+    idx = {f:i for i,f in enumerate(lexicon)}
+  oh_dataset=[]
+  tokens_dataset = []
+  for sequence in dataset:
+    oh_sequence=[]
+    token_sequence = []
+    for instance in sequence:
+      oh_instance=np.zeros(len(idx))
+      for feature in instance:
+        if feature in idx:
+          oh_instance[idx[feature]]=1
+          continue
+        if len(idx_t)>0 and feature.startswith('TOKEN'):
+          if feature in idx_t.keys():
+            token_sequence.append(idx_t[feature])
+          else:
+            token_sequence.append(0)
+
+      oh_sequence.append(oh_instance)
+    oh_dataset.append(oh_sequence)
+    tokens_dataset.append(token_sequence)
+  return oh_dataset, tokens_dataset, idx
+
+
+
 def one_hot_and_chars(dataset, idx={}, idx_c={}):
   if len(idx)==0:
     lexicon=set()
