@@ -25,8 +25,7 @@ logfile = None
 if args.logdir is not "":
   if not os.path.exists(args.logdir):
     os.makedirs(args.logdir)
-  logfile = os.path.join(args.logdir, "train_{}.log".format(dt))
-  print(logfile)
+  logfile = os.path.join(args.logdir, "train__c-lstm_{}.log".format(dt))
 
 
 train = json.load(open('train.json', 'r'))
@@ -107,7 +106,6 @@ for i_round in range(args.n_rounds):
   if logfile is not None:
     lf = open(logfile, "a+")
     lf.write("ROUND {}\n\n".format(i_round))
-    print("logfile opened!")
 
   pred=[]
   true=[]
