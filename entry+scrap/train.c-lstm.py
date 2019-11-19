@@ -25,7 +25,7 @@ logfile = None
 if args.logdir is not "":
   if not os.path.exists(args.logdir):
     os.makedirs(args.logdir)
-  logfile = os.path.join(args.logdir, "train_{}.log".format(dt))
+  logfile = os.path.join(args.logdir, "train__c-lstm_{}.log".format(dt))
 
 
 train = json.load(open('train.json', 'r'))
