@@ -28,8 +28,9 @@ if args.logdir is not "":
   logfile = os.path.join(args.logdir, "train__c-lstm_{}.log".format(dt))
 
 
-train = json.load(open('train.json', 'r'))
-test = json.load(open('test.json', 'r'))
+train = json.load(open('entries_data_train.json', 'r'))
+test = json.load(open('entries_data_test.json', 'r'))
+
 x_train = [e[0] for e in train]
 y_train = [e[1] for e in train]
 x_test = [e[0] for e in test]

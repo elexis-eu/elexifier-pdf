@@ -1,3 +1,4 @@
+import os
 import json
 import numpy as np
 from keras.preprocessing import sequence
@@ -6,10 +7,8 @@ from keras.layers import Input, Masking, Dense, Bidirectional, LSTM, TimeDistrib
 import argparse
 from datetime import datetime
 from time import time
-import os
 
 from funcs import extract_tokens, one_hot_and_tokens, one_hot_target
-
 
 
 parser=argparse.ArgumentParser()
@@ -82,7 +81,7 @@ t1 = time()
 for i_round in range(args.n_rounds):
   print('ROUND', i_round)
   t_r0 = time()
-  model.fit([x_train_oh, x_train_tokens], y_train_oh, batch_size=2, epochs=10, validation_data=([x_test_oh, x_test_tokens], y_test_oh), shuffle=True)
+  model.fit([x_train_oh, x_train_tokens], y_train_oh, batch_size=5, epochs=10, validation_data=([x_test_oh, x_test_tokens], y_test_oh), shuffle=True)
   score, acc = model.evaluate([x_test_oh, x_test_tokens], y_test_oh, batch_size=50)
 
   y_test_pred=model.predict([x_test_oh, x_test_tokens])
