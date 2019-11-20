@@ -69,13 +69,13 @@ max_sequence_len=max([len(e) for e in X_train_oh])*2
 X_train_oh=sequence.pad_sequences(X_train_oh,max_sequence_len)
 X_test_nonpad=X_test_oh[:]
 X_test_oh=sequence.pad_sequences(X_test_oh,max_sequence_len)
-print X_train_oh.shape
-print X_test_oh.shape
+print(X_train_oh.shape)
+print(X_test_oh.shape)
 y_train_oh,idx_label=one_hot_target(y_train)
 y_test_oh,_=one_hot_target(y_test,idx_label)
 y_train_oh=sequence.pad_sequences(y_train_oh,max_sequence_len)
 y_test_oh=sequence.pad_sequences(y_test_oh,max_sequence_len)
-rev_idx_label={v:k for k,v in idx_label.iteritems()}
+rev_idx_label={v:k for k,v in idx_label.items()}
 #print list(y_train_oh[0])
 
 model = Sequential()
@@ -87,11 +87,11 @@ model.add(Bidirectional(LSTM(12, input_shape=(max_sequence_len,len(idx)),recurre
 model.add(TimeDistributed(Dense(len(idx_label),activation='softmax')))
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 
-print model.summary()
+print(model.summary())
 
 
 for i in range(10):
-  print 'ROUND',i
+  print('ROUND',i)
   model.fit(X_train_oh,y_train_oh,batch_size=5,epochs=10,validation_data=(X_test_oh,y_test_oh))
   score,acc=model.evaluate(X_test_oh,y_test_oh,batch_size=50)
 
@@ -115,12 +115,12 @@ for i in range(10):
     if args.verbose:
       for a,b,c in zip(to_tags(p[i:]),to_tags(t[i:]),f):
         if a!=b:
-          print '!',a,b,'|'.join(c)
+          print('!',a,b,'|'.join(c))
         else:
-          print a,b,'|'.join(c)
-      print
+          print(a,b,'|'.join(c))
+      print()
     pred.extend(to_tags(p[i:]))
     true.extend(to_tags(t[i:]))
-  print confusion_matrix(true,pred)
-  print classification_report(true,pred)
-  print accuracy_score(true,pred)
+  print(confusion_matrix(true,pred))
+  print(classification_report(true,pred))
+  print(accuracy_score(true,pred))
