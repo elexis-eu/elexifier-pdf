@@ -161,6 +161,7 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
 
 
     # save training data into JSONs
+    # deprecated
     # json.dump( pages_data, open( json_pages, 'w' ), indent=4 )
     # json.dump( entries_data, open( json_entries, 'w' ), indent=4 )
     # json.dump( senses_data, open( json_senses, 'w' ), indent=4 )
@@ -169,19 +170,20 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
 
 
     # prepare the rest of the data that will go into ML for prediction
+    index_start = 0
+    page_n = 0
     unlabelled_pages = []   # order by pages, such will be the 1st level input
     feats_page = []
     line_n = 0
-    for token_p in tokens_raw[idx+1:]:
+    for token_p in tokens_raw:
 
         if token_p.text is None:        # sometimes empty tokens appear
             continue
 
         page_token = int( token_p.attrib['page'] )
-        if page_token != page_n:
+        if page_token != page_n and len( feats_page ) != 0:
             unlabelled_pages.append( feats_page )
             feats_page = []
-            page_n = page_token
         feat = ['SIZE=' + token_p.attrib['font-size'], 'BOLD=' + token_p.attrib['bold'], 'ITALIC=' + token_p.attrib['italic'], 'FONT=' + token_p.attrib['font-name'], 'TOKEN=' + token_p.text]
 
         line_token = int( token_p.attrib['line'] )
@@ -190,15 +192,17 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
             line_n = line_token
 
         feats_page.append( feat )
+        page_n = page_token
 
 
     unlabelled_pages.append( feats_page )
+    # deprecated
     # json.dump( unlabelled_pages, open( json_unlabelled, 'w' ), indent=4 )
 
     json_dict = {'pages' : pages_data,
                  'entries' : entries_data,
                  'senses' : senses_data,
-                 'unlabelled' : unlabelled_pages }
+                 'unlabelled' : unlabelled_pages}
 
     json.dump( json_dict, open( json_out_file, 'w' ), indent=4 )
     return json_dict
@@ -209,7 +213,7 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
 if __name__ == "__main__":
 
     # inputs
-    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_november/IrishSample.xml'
+    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_november/IrishSample_20p.xml'
     xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_november/Irish-annotated.xml'
 
     # outputs

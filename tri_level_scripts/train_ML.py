@@ -2,7 +2,7 @@ import json
 import numpy as np
 from keras.preprocessing import sequence
 from keras.models import Model
-from keras.layers import Input, Masking, Dense, Bidirectional, LSTM, TimeDistributed, Concatenate
+from keras.layers import Input, Masking, Dense, Bidirectional, LSTM, TimeDistributed, Concatenate, Dropout
 import argparse
 from datetime import datetime
 from time import time
@@ -102,11 +102,11 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
     chars_masked = Masking( 0 ) (chars_input)
     features_masked = Masking( 0 ) (features_input)
     chars_embed = Bidirectional( LSTM( 5, return_sequences=True ) ) (chars_masked)
-    # chars_embed = Dropout(0.5) (chars_embed)
+    chars_embed = Dropout(0.5) (chars_embed)
     features_merged = Concatenate( axis=-1 ) ([features_masked, chars_embed])
 
     h = Bidirectional( LSTM( 12, return_sequences=True ) ) (features_merged)
-    # h = Dropout(0.5) (h)
+    h = Dropout(0.5) (h)
     y = TimeDistributed( Dense( output_len, activation='softmax' ) ) (h)
     model = Model( inputs=[features_input, chars_input], outputs=y )
     print( model.summary() )
@@ -115,7 +115,7 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
 
 
 
-def train_on_data( data, n_rounds=10, verbose=True, logdir="/logs" ):
+def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/" ):
 
     dt = datetime.now().strftime( "%Y%m%d-%H%M%S" )
     logfile = None
@@ -235,13 +235,11 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="/logs" ):
 
 
 
-def train_ML( data_packed ):
+def train_ML( data_packed_file, json_out_file ):
 
     # train all 3 models
-    data = json.load( open( data_packed, 'r' ) )
-    model_pages, pages_infos = train_on_data( data['pages'] )
-    model_entries, entries_infos = train_on_data( data['entries'] )
-    model_senses, senses_infos = train_on_data( data['senses'] )
+    data = json.load( open( data_packed_file, 'r' ) )
+    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=10, verbose=False, logdir="" )
 
 
     # predict on the rest of the data
@@ -285,76 +283,88 @@ def train_ML( data_packed ):
 
 
 
-    # 2.) entries level prediction
-    x_new = entries_tokens
-    x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, entries_infos['idx'], entries_infos['idx_c'] )
-    x_new_oh = sequence.pad_sequences( x_new_oh, entries_infos['max_sequence_len'] )
-    x_new_chars_pad = [sequence.pad_sequences( seq, entries_infos['max_carray_len'] ) for seq in x_new_chars]
-    x_new_chars = sequence.pad_sequences( x_new_chars_pad, entries_infos['max_sequence_len'] )
-    X_new = [x_new_oh, x_new_chars]
-    rev_idx_label_entries = {v: k for k, v in entries_infos['idx_label'].items()}
+    # # 2.) entries level prediction
+    # model_entries, entries_infos = train_on_data( data['entries'] )
+    # x_new = entries_tokens
+    # x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, entries_infos['idx'], entries_infos['idx_c'] )
+    # x_new_oh = sequence.pad_sequences( x_new_oh, entries_infos['max_sequence_len'] )
+    # x_new_chars_pad = [sequence.pad_sequences( seq, entries_infos['max_carray_len'] ) for seq in x_new_chars]
+    # x_new_chars = sequence.pad_sequences( x_new_chars_pad, entries_infos['max_sequence_len'] )
+    # X_new = [x_new_oh, x_new_chars]
+    # rev_idx_label_entries = {v: k for k, v in entries_infos['idx_label'].items()}
+    #
+    # y_pred_entries = model_entries.predict( X_new )
+    #
+    # entries_labels = []
+    # senses_tokens = []
+    # sense = []
+    # for i_e in range( len( y_pred_entries ) ):
+    #
+    #     entry_labels = []
+    #     for i_t in range( len( entries_tokens[i_e] ) ):
+    #
+    #         token_cur = entries_tokens[i_e][i_t]
+    #         label_cur = rev_idx_label_entries[np.argmax( y_pred_entries[i_e][i_t] )]
+    #
+    #         if label_cur == 'SENSE_START':
+    #
+    #             if len( sense ) != 0:
+    #                 senses_tokens.append( sense )
+    #             sense = []
+    #
+    #         entry_labels.append( label_cur )
+    #         sense.append( token_cur )
+    #
+    #     entries_labels.append( entry_labels )
+    #
+    # if len( sense ) != 0:
+    #     senses_tokens.append( sense )
+    #
+    #
+    #
+    # # 3.) senses level prediction
+    # model_senses, senses_infos = train_on_data( data['senses'] )
+    # x_new = senses_tokens
+    # x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, senses_infos['idx'], senses_infos['idx_c'] )
+    # x_new_oh = sequence.pad_sequences( x_new_oh, senses_infos['max_sequence_len'] )
+    # x_new_chars_pad = [sequence.pad_sequences( seq, senses_infos['max_carray_len'] ) for seq in x_new_chars]
+    # x_new_chars = sequence.pad_sequences( x_new_chars_pad, senses_infos['max_sequence_len'] )
+    # X_new = [x_new_oh, x_new_chars]
+    # rev_idx_label_senses = {v: k for k, v in senses_infos['idx_label'].items()}
+    #
+    # y_pred_senses = model_senses.predict( X_new )
+    #
+    # senses_labels = []
+    # for i_s in range( len( senses_tokens ) ):
+    #
+    #     sense_labels = []
+    #     for i_t in range( len( senses_tokens[i_s] ) ):
+    #         # token_cur = senses_tokens[i_s][i_t]
+    #         label_cur = rev_idx_label_senses[np.argmax( y_pred_senses[i_s][i_t] )]
+    #         sense_labels.append( label_cur )
+    #
+    #     senses_labels.append( sense_labels )
 
-    y_pred_entries = model_entries.predict( X_new )
+    json_data = {'page_level': (pages_tokens, pages_labels) #,
+                 # 'entry_level': (entries_tokens, entries_labels),
+                 # 'sense_level': (senses_tokens, senses_labels)
+                }
 
-    entries_labels = []
-    senses_tokens = []
-    sense = []
-    for i_e in range( len( y_pred_entries ) ):
-
-        entry_labels = []
-        for i_t in range( len( entries_tokens[i_e] ) ):
-
-            token_cur = entries_tokens[i_e][i_t]
-            label_cur = rev_idx_label_entries[np.argmax( y_pred_entries[i_e][i_t] )]
-
-            if label_cur == 'SENSE_START':
-
-                if len( sense ) != 0:
-                    senses_tokens.append( sense )
-                sense = []
-
-            entry_labels.append( label_cur )
-            sense.append( token_cur )
-
-        entries_labels.append( entry_labels )
-
-    if len( sense ) != 0:
-        senses_tokens.append( sense )
-
-
-
-    # 3.) senses level prediction
-    x_new = senses_tokens
-    x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, senses_infos['idx'], senses_infos['idx_c'] )
-    x_new_oh = sequence.pad_sequences( x_new_oh, senses_infos['max_sequence_len'] )
-    x_new_chars_pad = [sequence.pad_sequences( seq, senses_infos['max_carray_len'] ) for seq in x_new_chars]
-    x_new_chars = sequence.pad_sequences( x_new_chars_pad, senses_infos['max_sequence_len'] )
-    X_new = [x_new_oh, x_new_chars]
-    rev_idx_label_senses = {v: k for k, v in senses_infos['idx_label'].items()}
-
-    y_pred_senses = model_senses.predict( X_new )
-
-    senses_labels = []
-    for i_s in range( len( senses_tokens ) ):
-
-        sense_labels = []
-        for i_t in range( len( senses_tokens[i_s] ) ):
-            # token_cur = senses_tokens[i_s][i_t]
-            label_cur = rev_idx_label_senses[np.argmax( y_pred_senses[i_s][i_t] )]
-            sense_labels.append( label_cur )
-
-        senses_labels.append( sense_labels )
-
-    json_data = {'pages_level': (pages_tokens, pages_labels),
-                 'entries_level': (entries_tokens, entries_labels),
-                 'senses_level': (senses_tokens, senses_labels)}
-
-    # json.dump( json_data, open( json_out_file, 'w' ), indent=4 )
+    json.dump( json_data, open( json_out_file, 'w' ), indent=4 )
 
     return json_data
 
 
 
+
+if __name__ == "__main__":
+
+    json_in_file = '/media/jan/Fisk/CJVT/outputs/json/irish_packed.json'
+    # json_in_file = '/home/jjug/data/irish_packed.json'
+
+    json_out_file = '/media/jan/Fisk/CJVT/outputs/json/irish_trained.json'
+
+    train_ML( json_in_file, json_out_file )
 
 
 
