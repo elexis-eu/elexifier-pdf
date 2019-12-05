@@ -12,12 +12,12 @@ import os
 
 
 
-parser=argparse.ArgumentParser()
-parser.add_argument('-p', '--percentage', help='percentage of the training data to be used', type=float, default=1.0)
-parser.add_argument('-v', '--verbose', action='store_true')
-parser.add_argument('-nr', '--n_rounds', help='number of repetitions of 10 epoch training', type=int, default=10)
-parser.add_argument('-ld', '--logdir', help='directory where the log file will be stored', type=str, default="")
-args = parser.parse_args()
+# parser=argparse.ArgumentParser()
+# parser.add_argument('-p', '--percentage', help='percentage of the training data to be used', type=float, default=1.0)
+# parser.add_argument('-v', '--verbose', action='store_true')
+# parser.add_argument('-nr', '--n_rounds', help='number of repetitions of 10 epoch training', type=int, default=10)
+# parser.add_argument('-ld', '--logdir', help='directory where the log file will be stored', type=str, default="")
+# args = parser.parse_args()
 
 
 
@@ -115,18 +115,17 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
 
 
 
-def train_on_data( data_file, n_rounds=10 ):
+def train_on_data( data, n_rounds=10, verbose=True, logdir="/logs" ):
 
     dt = datetime.now().strftime( "%Y%m%d-%H%M%S" )
     logfile = None
-    verbose = args.verbose
-    if verbose and args.logdir is not "":
-        if not os.path.exists(args.logdir):
-            os.makedirs(args.logdir)
-        logfile = os.path.join(args.logdir, "train_c-lstm_{}.log".format(dt))
+    if verbose and logdir is not "":
+        if not os.path.exists( logdir ):
+            os.makedirs( logdir )
+        logfile = os.path.join( logdir, "train_c-lstm_{}.log".format(dt) )
 
     # data preparation
-    data = json.load( open( data_file, 'r' ) )
+    # data = json.load( open( data_file, 'r' ) )
     n_train = int( len( data )*0.7 )
     train = data[:n_train]
     test = data[n_train:]
@@ -203,7 +202,7 @@ def train_on_data( data_file, n_rounds=10 ):
                 for i,u in enumerate(t):
                     if sum(u)>0:
                         break
-                if args.verbose:
+                if verbose:
                     for a,b,c in zip(to_tags(p[i:]),to_tags(t[i:]),f):
                         if a!=b:
                             # print('!',a,b,'|'.join(c))
