@@ -44,7 +44,7 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
     prev_entry = None
     prev_sense = None
 
-    page_n = 1
+    page_n = int( tokens_raw[0].attrib['page'] )
     line_n = 0
     # iterate over the annotated data that will be used for ML training
     for idx, token_a in enumerate( tokens_lex ):
@@ -171,7 +171,7 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
 
     # prepare the rest of the data that will go into ML for prediction
     index_start = 0
-    page_n = 0
+    page_n = int( tokens_raw[0].attrib['page'] )
     unlabelled_pages = []   # order by pages, such will be the 1st level input
     feats_page = []
     line_n = 0
@@ -213,15 +213,15 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
 if __name__ == "__main__":
 
     # inputs
-    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_november/IrishSample_20p.xml'
-    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_november/Irish-annotated.xml'
+    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_november/IrishSample_11-20p.xml'
+    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_november/Irish_hand_annotated.xml'
 
     # outputs
     # json_pages = '/media/jan/Fisk/CJVT/outputs/json/irish_pages.json'
     # json_entries = '/media/jan/Fisk/CJVT/outputs/json/irish_entries.json'
     # json_senses = '/media/jan/Fisk/CJVT/outputs/json/irish_senses.json'
     # json_unlabelled = '/media/jan/Fisk/CJVT/outputs/json/irish_unlabeled.json'
-    json_out = '/media/jan/Fisk/CJVT/outputs/json/irish_packed.json'
+    json_out = '/media/jan/Fisk/CJVT/outputs/json/irish_packed_11-20p.json'
 
     json_d = xml2json( xml_raw, xml_lex, json_out )
 
