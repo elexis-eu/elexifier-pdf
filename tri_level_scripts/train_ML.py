@@ -126,7 +126,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/" ):
 
     # data preparation
     # data = json.load( open( data_file, 'r' ) )
-    n_train = int( len( data )*0.7 )
+    n_train = int( round( len( data )*0.7 ) )
     train = data[:n_train]
     test = data[n_train:]
 
@@ -239,7 +239,7 @@ def train_ML( data_packed_file, json_out_file ):
 
     # train all 3 models
     data = json.load( open( data_packed_file, 'r' ) )
-    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=10, verbose=False, logdir="" )
+    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=10, verbose=True, logdir="/media/jan/Fisk/CJVT/outputs/train_191216" )
 
 
     # predict on the rest of the data
@@ -359,10 +359,10 @@ def train_ML( data_packed_file, json_out_file ):
 
 if __name__ == "__main__":
 
-    json_in_file = '/media/jan/Fisk/CJVT/outputs/json/irish_packed.json'
+    json_in_file = '/media/jan/Fisk/CJVT/outputs/json/irish_packed_1-40p.json'
     # json_in_file = '/home/jjug/data/irish_packed.json'
 
-    json_out_file = '/media/jan/Fisk/CJVT/outputs/json/irish_trained.json'
+    json_out_file = '/media/jan/Fisk/CJVT/outputs/json/irish_trained_1-40p.json'
 
     train_ML( json_in_file, json_out_file )
 

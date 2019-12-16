@@ -54,6 +54,9 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
             print( 'Misaligned data at token {}:{}!\nBreaking...'.format( idx, token_a ) )
             break
 
+        if token_r.text is None:
+            continue    # jump over empty tokens
+
         page_token = int( token_r.attrib['page'] )
         if page_token != page_n:
             pages_data.append( (feats_page, labels_page) )
@@ -213,15 +216,15 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
 if __name__ == "__main__":
 
     # inputs
-    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_november/IrishSample_11-20p.xml'
-    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_november/Irish_hand_annotated.xml'
+    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/IrishSample_p1-40.xml'
+    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/Irish-annotated_extra-entries.xml'
 
     # outputs
     # json_pages = '/media/jan/Fisk/CJVT/outputs/json/irish_pages.json'
     # json_entries = '/media/jan/Fisk/CJVT/outputs/json/irish_entries.json'
     # json_senses = '/media/jan/Fisk/CJVT/outputs/json/irish_senses.json'
     # json_unlabelled = '/media/jan/Fisk/CJVT/outputs/json/irish_unlabeled.json'
-    json_out = '/media/jan/Fisk/CJVT/outputs/json/irish_packed_11-20p.json'
+    json_out = '/media/jan/Fisk/CJVT/outputs/json/irish_packed_1-40p.json'
 
     json_d = xml2json( xml_raw, xml_lex, json_out )
 
