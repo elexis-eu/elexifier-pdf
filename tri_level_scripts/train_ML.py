@@ -3,6 +3,7 @@ import numpy as np
 from keras.preprocessing import sequence
 from keras.models import Model
 from keras.layers import Input, Masking, Dense, Bidirectional, LSTM, TimeDistributed, Concatenate, Dropout
+from keras.optimizers import Adam, SGD
 import argparse
 from datetime import datetime
 from time import time
@@ -101,12 +102,12 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
     chars_input = Input( shape=input_shape_char )
     chars_masked = Masking( 0 ) (chars_input)
     features_masked = Masking( 0 ) (features_input)
-    chars_embed = Bidirectional( LSTM( 5, return_sequences=True ) ) (chars_masked)
-    chars_embed = Dropout(0.5) (chars_embed)
+    chars_embed = Bidirectional( LSTM( 8, return_sequences=True ) ) (chars_masked)
+    # chars_embed = Dropout(0.5) (chars_embed)
     features_merged = Concatenate( axis=-1 ) ([features_masked, chars_embed])
 
-    h = Bidirectional( LSTM( 12, return_sequences=True ) ) (features_merged)
-    h = Dropout(0.5) (h)
+    h = Bidirectional( LSTM( 16, return_sequences=True ) ) (features_merged)
+    # h = Dropout(0.5) (h)
     y = TimeDistributed( Dense( output_len, activation='softmax' ) ) (h)
     model = Model( inputs=[features_input, chars_input], outputs=y )
     print( model.summary() )
@@ -126,7 +127,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/" ):
 
     # data preparation
     # data = json.load( open( data_file, 'r' ) )
-    n_train = int( round( len( data )*0.7 ) )
+    n_train = int( round( len( data )*0.75 ) )
     train = data[:n_train]
     test = data[n_train:]
 
@@ -170,7 +171,8 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/" ):
                   'max_carray_len': max_carray_len}
 
     model = model_cLSTM( (max_sequence_len, len( idx )), (max_sequence_len, max_carray_len), len( idx_label ) )
-    model.compile( loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'] )
+    optim = Adam( lr=0.001 )
+    model.compile( loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'] )
 
     t1 = time()
     for i_round in range(n_rounds):
@@ -178,7 +180,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/" ):
         if verbose: print('ROUND', i_round)
         t_r0 = time()
 
-        model.fit( X_train, y_train_oh, batch_size=5, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
+        model.fit( X_train, y_train_oh, batch_size=2, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
         # score, acc = model.evaluate( X_test, y_test_oh, batch_size=50 )
 
         if verbose:
