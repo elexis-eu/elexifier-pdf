@@ -118,7 +118,7 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
 
 
 
-def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/" ):
+def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5 ):
 
     dt = datetime.now().strftime( "%Y%m%d-%H%M%S" )
     logfile = None
@@ -184,7 +184,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/" ):
         if verbose: print('ROUND', i_round)
         t_r0 = time()
 
-        model.fit( X_train, y_train_oh, batch_size=2, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
+        model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
         # score, acc = model.evaluate( X_test, y_test_oh, batch_size=50 )
 
         if verbose:
@@ -241,11 +241,11 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/" ):
 
 
 
-def train_ML( data_packed_file, json_out_file ):
+def train_ML( data_packed_file, json_out_file, logdir ):
 
     # train all 3 models
     data = json.load( open( data_packed_file, 'r' ) )
-    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=15, verbose=True, logdir="/home/jjug/logs/train_20191218" )
+    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=15, verbose=True, logdir=logdir, batch_size=2 )
 
 
     # predict on the rest of the data
@@ -290,7 +290,7 @@ def train_ML( data_packed_file, json_out_file ):
 
 
     # 2.) entries level prediction
-    model_entries, entries_infos = train_on_data( data['entries'] )
+    model_entries, entries_infos = train_on_data( data['entries'], n_rounds=15, verbose=True, logdir=logdir, batch_size=5 )
     x_new = entries_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, entries_infos['idx'], entries_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, entries_infos['max_sequence_len'] )
@@ -329,7 +329,7 @@ def train_ML( data_packed_file, json_out_file ):
 
 
     # 3.) senses level prediction
-    model_senses, senses_infos = train_on_data( data['senses'] )
+    model_senses, senses_infos = train_on_data( data['senses'], n_rounds=15, verbose=True, logdir=logdir, batch_size=5 )
     x_new = senses_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, senses_infos['idx'], senses_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, senses_infos['max_sequence_len'] )
@@ -371,7 +371,9 @@ if __name__ == "__main__":
     # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/irish_trained_1-40p.json'
     json_out_file = '/home/jjug/data/irish_trained_1-40p.json'
 
-    train_ML( json_in_file, json_out_file )
+    logdir = "/home/jjug/logs/train_20191220"
+
+    train_ML( json_in_file, json_out_file, logdir )
 
 
 
