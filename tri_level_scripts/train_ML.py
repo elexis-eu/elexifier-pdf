@@ -3,7 +3,7 @@ import numpy as np
 from keras.preprocessing import sequence
 from keras.models import Model
 from keras.layers import Input, Masking, Dense, Bidirectional, LSTM, TimeDistributed, Concatenate, Dropout
-from keras.optimizers import Adam, SGD
+from keras.optimizers import Adam, SGD, RMSprop
 import argparse
 from datetime import datetime
 from time import time
@@ -103,11 +103,13 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
     chars_masked = Masking( 0 ) (chars_input)
     features_masked = Masking( 0 ) (features_input)
     chars_embed = Bidirectional( LSTM( 8, return_sequences=True ) ) (chars_masked)
-    # chars_embed = Dropout(0.5) (chars_embed)
+    chars_embed = Dropout(0.25) (chars_embed)
     features_merged = Concatenate( axis=-1 ) ([features_masked, chars_embed])
 
-    h = Bidirectional( LSTM( 16, return_sequences=True ) ) (features_merged)
-    # h = Dropout(0.5) (h)
+    h = Bidirectional( LSTM( 20, return_sequences=True ) ) (features_merged)
+    h = Dropout(0.25) (h)
+    # h = Bidirectional( LSTM( 8, return_sequences=True ) ) (h)
+    # h = Dropout(0.25) (h)
     y = TimeDistributed( Dense( output_len, activation='softmax' ) ) (h)
     model = Model( inputs=[features_input, chars_input], outputs=y )
     print( model.summary() )
@@ -171,7 +173,9 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/" ):
                   'max_carray_len': max_carray_len}
 
     model = model_cLSTM( (max_sequence_len, len( idx )), (max_sequence_len, max_carray_len), len( idx_label ) )
-    optim = Adam( lr=0.001 )
+#    optim = Adam( lr=0.005 )
+#    optim = SGD( lr=0.01, momentum=0.9, nesterov=True )
+    optim = RMSprop( lr=0.005 )
     model.compile( loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'] )
 
     t1 = time()
@@ -241,7 +245,7 @@ def train_ML( data_packed_file, json_out_file ):
 
     # train all 3 models
     data = json.load( open( data_packed_file, 'r' ) )
-    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=20, verbose=True, logdir="/home/jjug/logs/train_20191216" )
+    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=15, verbose=True, logdir="/home/jjug/logs/train_20191218" )
 
 
     # predict on the rest of the data
