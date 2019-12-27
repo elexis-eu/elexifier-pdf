@@ -178,6 +178,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
     optim = RMSprop( lr=0.005 )
     model.compile( loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'] )
     best_acc = 0
+    best_model_path = 'best_model_' + dt + '.h5'
 
     t1 = time()
     for i_round in range(n_rounds):
@@ -188,8 +189,9 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
         h = model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
         score, acc = model.evaluate( X_test, y_test_oh, batch_size=5 )
         if acc > best_acc:
+            print( "best model accuracy,", acc, ", saving..." )
             best_acc = acc
-            best_model = model.save()
+            model.save_weights( best_model_path )
 
         if verbose:
             y_test_pred = model.predict( X_test )
@@ -239,9 +241,10 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
                 lf.write("\n")
                 lf.close()
 
-
+    # in the end load the model with the best score
+    model = model.load_weights( best_model_path )
     if verbose: print("Training time:", (time()-t1), "s")
-    return best_model, data_infos
+    return model, data_infos
 
 
 
@@ -370,10 +373,10 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 if __name__ == "__main__":
 
     # json_in_file = '/media/jan/Fisk/CJVT/outputs/json/irish_packed_1-40p.json'
-    json_in_file = '/home/jjug/data/irish_packed_1-40p.json'
+    json_in_file = '/home/jjug/data/slovarji/mali_sloang_packed.json'
 
     # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/irish_trained_1-40p.json'
-    json_out_file = '/home/jjug/data/irish_trained_1-40p.json'
+    json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained.json'
 
     logdir = "/home/jjug/logs/train_20191220"
 

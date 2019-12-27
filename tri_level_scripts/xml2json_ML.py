@@ -80,7 +80,8 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
         form = None
         pos = None
         sense = None
-        cit = None
+        # variant = None
+        trans = None
 
         # collect all the containers
         container = get_parent_container( token_a, parent_map )
@@ -94,15 +95,17 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
                 pos = container
             elif container.attrib['name'] == 'sense':
                 sense = container
-            elif container.attrib['name'] == 'cit':
-                cit = container
+            # elif container.attrib['name'] == 'variant':
+            #     variant = container
+            elif container.attrib['name'] == 'translation':
+                trans = container
 
             container = get_parent_container( container, parent_map )
 
         # page level labels
         if entry is not None:
 
-            if token_a == list( entry )[0]:
+            if token_a == next( entry.iter('TOKEN') ):          # if the token_a is the first TOKEN in entry
                 label_p = 'ENTRY_START'
             else:
                 label_p = 'ENTRY_INSIDE'
@@ -114,14 +117,14 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
                 label_e = 'POS'
             elif sense is not None:
 
-                if token_a == list( sense )[0]:
+                if token_a == next( sense.iter('TOKEN') ):      # if the token_a is the first TOKEN in sense
                     label_e = 'SENSE_START'
                 else:
                     label_e = 'SENSE_INSIDE'
 
                 # sense level labels
-                if cit is not None:
-                    label_s = 'CIT'
+                if trans is not None:
+                    label_s = 'TRANS'
                 else:
                     label_s = 'INSIDE'
 
@@ -216,15 +219,15 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
 if __name__ == "__main__":
 
     # inputs
-    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/IrishSample_p1-40.xml'
-    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/Irish-annotated_extra-entries.xml'
+    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/srbslo_2_kor-20-pages.xml'
+    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/srbslo_2_kor-annotated.xml'
 
     # outputs
     # json_pages = '/media/jan/Fisk/CJVT/outputs/json/irish_pages.json'
     # json_entries = '/media/jan/Fisk/CJVT/outputs/json/irish_entries.json'
     # json_senses = '/media/jan/Fisk/CJVT/outputs/json/irish_senses.json'
     # json_unlabelled = '/media/jan/Fisk/CJVT/outputs/json/irish_unlabeled.json'
-    json_out = '/media/jan/Fisk/CJVT/outputs/json/irish_packed_1-40p.json'
+    json_out = '/media/jan/Fisk/CJVT/outputs/json/srbslo_2_kor_packed.json'
 
     json_d = xml2json( xml_raw, xml_lex, json_out )
 
