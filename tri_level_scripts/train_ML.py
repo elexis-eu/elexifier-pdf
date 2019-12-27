@@ -290,7 +290,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
 
     # 2.) entries level prediction
-    model_entries, entries_infos = train_on_data( data['entries'], n_rounds=15, verbose=True, logdir=logdir, batch_size=5 )
+    model_entries, entries_infos = train_on_data( data['entries'], n_rounds=10, verbose=True, logdir=logdir, batch_size=5 )
     x_new = entries_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, entries_infos['idx'], entries_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, entries_infos['max_sequence_len'] )
@@ -329,7 +329,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
 
     # 3.) senses level prediction
-    model_senses, senses_infos = train_on_data( data['senses'], n_rounds=15, verbose=True, logdir=logdir, batch_size=5 )
+    model_senses, senses_infos = train_on_data( data['senses'], n_rounds=10, verbose=True, logdir=logdir, batch_size=5 )
     x_new = senses_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, senses_infos['idx'], senses_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, senses_infos['max_sequence_len'] )
