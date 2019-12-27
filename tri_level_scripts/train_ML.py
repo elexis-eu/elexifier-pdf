@@ -177,6 +177,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
 #    optim = SGD( lr=0.01, momentum=0.9, nesterov=True )
     optim = RMSprop( lr=0.005 )
     model.compile( loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'] )
+    best_acc = 0
 
     t1 = time()
     for i_round in range(n_rounds):
@@ -184,8 +185,11 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
         if verbose: print('ROUND', i_round)
         t_r0 = time()
 
-        model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
-        # score, acc = model.evaluate( X_test, y_test_oh, batch_size=50 )
+        h = model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
+        score, acc = model.evaluate( X_test, y_test_oh, batch_size=5 )
+        if acc > best_acc:
+            best_acc = acc
+            best_model = model.save()
 
         if verbose:
             y_test_pred = model.predict( X_test )
@@ -237,7 +241,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
 
 
     if verbose: print("Training time:", (time()-t1), "s")
-    return model, data_infos
+    return best_model, data_infos
 
 
 
