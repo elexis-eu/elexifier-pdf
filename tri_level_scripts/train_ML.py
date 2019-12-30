@@ -103,11 +103,11 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
     chars_masked = Masking( 0 ) (chars_input)
     features_masked = Masking( 0 ) (features_input)
     chars_embed = Bidirectional( LSTM( 8, return_sequences=True ) ) (chars_masked)
-    chars_embed = Dropout(0.25) (chars_embed)
+    chars_embed = Dropout(0.33) (chars_embed)
     features_merged = Concatenate( axis=-1 ) ([features_masked, chars_embed])
 
     h = Bidirectional( LSTM( 20, return_sequences=True ) ) (features_merged)
-    h = Dropout(0.25) (h)
+    h = Dropout(0.33) (h)
     # h = Bidirectional( LSTM( 8, return_sequences=True ) ) (h)
     # h = Dropout(0.25) (h)
     y = TimeDistributed( Dense( output_len, activation='softmax' ) ) (h)
@@ -178,7 +178,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
     optim = RMSprop( lr=0.005 )
     model.compile( loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'] )
     best_acc = 0
-    best_model_path = 'best_model_' + dt + '.h5'
+    best_model_path = 'best_models/best_model_' + dt + '.h5'
 
     t1 = time()
     for i_round in range(n_rounds):
@@ -253,6 +253,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
     # train all 3 models
     data = json.load( open( data_packed_file, 'r' ) )
     model_pages, pages_infos = train_on_data( data['pages'], n_rounds=15, verbose=True, logdir=logdir, batch_size=2 )
+    # DEBUG # model_pages.load_weights( "/home/jan/PycharmProjects/cjvt-dev/elexifier-pdf/tri_level_scripts/best_model_20191227-150903.h5" )
 
 
     # predict on the rest of the data
@@ -298,6 +299,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # 2.) entries level prediction
     model_entries, entries_infos = train_on_data( data['entries'], n_rounds=10, verbose=True, logdir=logdir, batch_size=5 )
+    # DEBUG # model_entries.load_weights( "/home/jan/PycharmProjects/cjvt-dev/elexifier-pdf/tri_level_scripts/best_model_20191227-153452.h5" )
     x_new = entries_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, entries_infos['idx'], entries_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, entries_infos['max_sequence_len'] )
@@ -317,7 +319,10 @@ def train_ML( data_packed_file, json_out_file, logdir ):
         for i_t in range( len( entries_tokens[i_e] ) ):
 
             token_cur = entries_tokens[i_e][i_t]
-            label_cur = rev_idx_label_entries[np.argmax( y_pred_entries[i_e][i_t] )]
+            if i_t < entries_infos['max_sequence_len']:
+                label_cur = rev_idx_label_entries[np.argmax( y_pred_entries[i_e][i_t] )]
+            else:
+                label_cur = 'INSIDE'
 
             if label_cur == 'SENSE_START':
 
@@ -353,7 +358,10 @@ def train_ML( data_packed_file, json_out_file, logdir ):
         sense_labels = []
         for i_t in range( len( senses_tokens[i_s] ) ):
             # token_cur = senses_tokens[i_s][i_t]
-            label_cur = rev_idx_label_senses[np.argmax( y_pred_senses[i_s][i_t] )]
+            if i_t < senses_infos['max_sequence_len']:
+                label_cur = rev_idx_label_senses[np.argmax( y_pred_senses[i_s][i_t] )]
+            else:
+                label_cur = 'INSIDE'
             sense_labels.append( label_cur )
 
         senses_labels.append( sense_labels )
@@ -372,13 +380,14 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
 if __name__ == "__main__":
 
-    # json_in_file = '/media/jan/Fisk/CJVT/outputs/json/irish_packed_1-40p.json'
+    # json_in_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_packed.json'
     json_in_file = '/home/jjug/data/slovarji/mali_sloang_packed.json'
 
-    # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/irish_trained_1-40p.json'
+    # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_trained.json'
     json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained.json'
 
     logdir = "/home/jjug/logs/train_20191220"
+    # logdir = ""
 
     train_ML( json_in_file, json_out_file, logdir )
 
