@@ -103,11 +103,11 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
     chars_masked = Masking( 0 ) (chars_input)
     features_masked = Masking( 0 ) (features_input)
     chars_embed = Bidirectional( LSTM( 8, return_sequences=True ) ) (chars_masked)
-    chars_embed = Dropout(0.33) (chars_embed)
+    chars_embed = Dropout( 0.4 ) (chars_embed)
     features_merged = Concatenate( axis=-1 ) ([features_masked, chars_embed])
 
     h = Bidirectional( LSTM( 20, return_sequences=True ) ) (features_merged)
-    h = Dropout(0.33) (h)
+    h = Dropout( 0.4 ) (h)
     # h = Bidirectional( LSTM( 8, return_sequences=True ) ) (h)
     # h = Dropout(0.25) (h)
     y = TimeDistributed( Dense( output_len, activation='softmax' ) ) (h)
@@ -252,7 +252,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # train all 3 models
     data = json.load( open( data_packed_file, 'r' ) )
-    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=15, verbose=True, logdir=logdir, batch_size=2 )
+    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=10, verbose=True, logdir=logdir, batch_size=2 )
     # DEBUG # model_pages.load_weights( "/home/jan/PycharmProjects/cjvt-dev/elexifier-pdf/tri_level_scripts/best_model_20191227-150903.h5" )
 
 
