@@ -2,3 +2,4 @@
 *.log
 */logs/*
 /venv/*
+*/best_models/*

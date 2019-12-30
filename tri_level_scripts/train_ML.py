@@ -242,7 +242,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
                 lf.close()
 
     # in the end load the model with the best score
-    model = model.load_weights( best_model_path )
+    model.load_weights( best_model_path )
     if verbose: print("Training time:", (time()-t1), "s")
     return model, data_infos
 
