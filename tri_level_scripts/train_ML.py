@@ -103,11 +103,11 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
     chars_masked = Masking( 0 ) (chars_input)
     features_masked = Masking( 0 ) (features_input)
     chars_embed = Bidirectional( LSTM( 8, return_sequences=True ) ) (chars_masked)
-    chars_embed = Dropout(0.33) (chars_embed)
+    chars_embed = Dropout(0.4) (chars_embed)
     features_merged = Concatenate( axis=-1 ) ([features_masked, chars_embed])
 
     h = Bidirectional( LSTM( 20, return_sequences=True ) ) (features_merged)
-    h = Dropout(0.33) (h)
+    h = Dropout(0.4) (h)
     # h = Bidirectional( LSTM( 8, return_sequences=True ) ) (h)
     # h = Dropout(0.25) (h)
     y = TimeDistributed( Dense( output_len, activation='softmax' ) ) (h)
@@ -177,8 +177,11 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
 #    optim = SGD( lr=0.01, momentum=0.9, nesterov=True )
     optim = RMSprop( lr=0.005 )
     model.compile( loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'] )
-    best_acc = 0
-    best_model_path = 'best_models/best_model_' + dt + '.h5'
+    # best_acc = 0
+    # best_model_path = 'best_models/best_model_' + dt + '.h5'
+    # debug!!
+    # best_model_path = "/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_20191230-121243.h5"
+    # model.load_weights( best_model_path )
 
     t1 = time()
     for i_round in range(n_rounds):
@@ -187,11 +190,11 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
         t_r0 = time()
 
         h = model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
-        score, acc = model.evaluate( X_test, y_test_oh, batch_size=5 )
-        if acc > best_acc:
-            print( "best model accuracy,", acc, ", saving..." )
-            best_acc = acc
-            model.save_weights( best_model_path )
+        # score, acc = model.evaluate( X_test, y_test_oh, batch_size=5 )
+        # if acc > best_acc:
+        #     print( "best model accuracy,", acc, ", saving..." )
+        #     best_acc = acc
+        #     model.save_weights( best_model_path )
 
         if verbose:
             y_test_pred = model.predict( X_test )
@@ -242,7 +245,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
                 lf.close()
 
     # in the end load the model with the best score
-    model.load_weights( best_model_path )
+    # model.load_weights( best_model_path )
     if verbose: print("Training time:", (time()-t1), "s")
     return model, data_infos
 
@@ -252,8 +255,9 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # train all 3 models
     data = json.load( open( data_packed_file, 'r' ) )
-    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=15, verbose=True, logdir=logdir, batch_size=2 )
-    # DEBUG # model_pages.load_weights( "/home/jan/PycharmProjects/cjvt-dev/elexifier-pdf/tri_level_scripts/best_model_20191227-150903.h5" )
+    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=10, verbose=True, logdir=logdir, batch_size=2 )
+    # DEBUG #
+    # model_pages.load_weights( "/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_20191230-121243.h5" )
 
 
     # predict on the rest of the data
@@ -299,7 +303,8 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # 2.) entries level prediction
     model_entries, entries_infos = train_on_data( data['entries'], n_rounds=10, verbose=True, logdir=logdir, batch_size=5 )
-    # DEBUG # model_entries.load_weights( "/home/jan/PycharmProjects/cjvt-dev/elexifier-pdf/tri_level_scripts/best_model_20191227-153452.h5" )
+    # DEBUG #
+    # model_entries.load_weights( "/home/jan/PycharmProjects/cjvt-dev/elexifier-pdf/tri_level_scripts/best_model_20191227-153452.h5" )
     x_new = entries_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, entries_infos['idx'], entries_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, entries_infos['max_sequence_len'] )
@@ -386,7 +391,7 @@ if __name__ == "__main__":
     # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_trained.json'
     json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained.json'
 
-    logdir = "/home/jjug/logs/train_20191220"
+    logdir = "/home/jjug/logs/train_20200108"
     # logdir = ""
 
     train_ML( json_in_file, json_out_file, logdir )
