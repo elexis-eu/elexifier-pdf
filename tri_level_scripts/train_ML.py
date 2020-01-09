@@ -177,9 +177,9 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
 #    optim = SGD( lr=0.01, momentum=0.9, nesterov=True )
     optim = RMSprop( lr=0.005 )
     model.compile( loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'] )
-    # best_acc = 0
-    # best_model_path = 'best_models/best_model_' + dt + '.h5'
-    # debug!!
+    best_acc = 0
+    best_model_path = '/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_' + dt + '.h5'
+    # DEBUG #
     # best_model_path = "/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_20191230-121243.h5"
     # model.load_weights( best_model_path )
 
@@ -190,11 +190,11 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
         t_r0 = time()
 
         h = model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
-        # score, acc = model.evaluate( X_test, y_test_oh, batch_size=5 )
-        # if acc > best_acc:
-        #     print( "best model accuracy,", acc, ", saving..." )
-        #     best_acc = acc
-        #     model.save_weights( best_model_path )
+        score, acc = model.evaluate( X_test, y_test_oh, batch_size=5 )
+        if acc > best_acc:
+            print( "best model accuracy,", acc, ", saving..." )
+            best_acc = acc
+            model.save_weights( best_model_path )
 
         if verbose:
             y_test_pred = model.predict( X_test )
@@ -245,7 +245,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
                 lf.close()
 
     # in the end load the model with the best score
-    # model.load_weights( best_model_path )
+    model.load_weights( best_model_path )
     if verbose: print("Training time:", (time()-t1), "s")
     return model, data_infos
 
@@ -255,7 +255,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # train all 3 models
     data = json.load( open( data_packed_file, 'r' ) )
-    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=10, verbose=True, logdir=logdir, batch_size=2 )
+    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=8, verbose=True, logdir=logdir, batch_size=4 )
     # DEBUG #
     # model_pages.load_weights( "/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_20191230-121243.h5" )
 
@@ -282,8 +282,9 @@ def train_ML( data_packed_file, json_out_file, logdir ):
         page_labels = []
         for i_t in range( len( pages_tokens[i_p] ) ):
 
+            i_t_pad = i_t + len( y_pred_pages[i_p] ) - len( pages_tokens[i_p] )     # jump over the padded zeros
             token_cur = pages_tokens[i_p][i_t]
-            label_cur = rev_idx_label_pages[np.argmax( y_pred_pages[i_p][i_t] )]
+            label_cur = rev_idx_label_pages[np.argmax( y_pred_pages[i_p][i_t_pad] )]
 
             if label_cur == 'ENTRY_START':
 
@@ -302,7 +303,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
 
     # 2.) entries level prediction
-    model_entries, entries_infos = train_on_data( data['entries'], n_rounds=10, verbose=True, logdir=logdir, batch_size=5 )
+    model_entries, entries_infos = train_on_data( data['entries'], n_rounds=8, verbose=True, logdir=logdir, batch_size=8 )
     # DEBUG #
     # model_entries.load_weights( "/home/jan/PycharmProjects/cjvt-dev/elexifier-pdf/tri_level_scripts/best_model_20191227-153452.h5" )
     x_new = entries_tokens
@@ -323,9 +324,10 @@ def train_ML( data_packed_file, json_out_file, logdir ):
         entry_labels = []
         for i_t in range( len( entries_tokens[i_e] ) ):
 
+            i_t_pad = i_t + len( y_pred_entries[i_e] ) - len( entries_tokens[i_e] )     # jump over the padded zeros
             token_cur = entries_tokens[i_e][i_t]
             if i_t < entries_infos['max_sequence_len']:
-                label_cur = rev_idx_label_entries[np.argmax( y_pred_entries[i_e][i_t] )]
+                label_cur = rev_idx_label_entries[np.argmax( y_pred_entries[i_e][i_t_pad] )]
             else:
                 label_cur = 'INSIDE'
 
@@ -346,7 +348,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
 
     # 3.) senses level prediction
-    model_senses, senses_infos = train_on_data( data['senses'], n_rounds=10, verbose=True, logdir=logdir, batch_size=5 )
+    model_senses, senses_infos = train_on_data( data['senses'], n_rounds=8, verbose=True, logdir=logdir, batch_size=8 )
     x_new = senses_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, senses_infos['idx'], senses_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, senses_infos['max_sequence_len'] )
@@ -362,9 +364,10 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
         sense_labels = []
         for i_t in range( len( senses_tokens[i_s] ) ):
+            i_t_pad = i_t + len( y_pred_senses[i_s] ) - len( senses_tokens[i_s] )
             # token_cur = senses_tokens[i_s][i_t]
             if i_t < senses_infos['max_sequence_len']:
-                label_cur = rev_idx_label_senses[np.argmax( y_pred_senses[i_s][i_t] )]
+                label_cur = rev_idx_label_senses[np.argmax( y_pred_senses[i_s][i_t_pad] )]
             else:
                 label_cur = 'INSIDE'
             sense_labels.append( label_cur )
@@ -394,7 +397,7 @@ if __name__ == "__main__":
     logdir = "/home/jjug/logs/train_20200109"
     # logdir = ""
 
-    train_ML( json_in_file, json_out_file, logdir )
+    jdata = train_ML( json_in_file, json_out_file, logdir )
 
 
 
