@@ -321,12 +321,18 @@ def train_ML( data_packed_file, json_out_file, logdir ):
     sense = []
     for i_e in range( len( y_pred_entries ) ):
 
+        n_tokens_in = len( entries_tokens[i_e] )
         entry_labels = []
-        for i_t in range( len( entries_tokens[i_e] ) ):
+        for i_t in range( n_tokens_in ):
 
-            i_t_pad = i_t + len( y_pred_entries[i_e] ) - len( entries_tokens[i_e] )     # jump over the padded zeros
+            # take care of correct indices with regard to padding and max_sequence_len
+            if n_tokens_in <= entries_infos['max_sequence_len']:
+                i_t_pad = i_t + entries_infos['max_sequence_len'] - n_tokens_in
+            else:
+                i_t_pad = i_t
+
             token_cur = entries_tokens[i_e][i_t]
-            if i_t < entries_infos['max_sequence_len']:
+            if i_t_pad < entries_infos['max_sequence_len']:
                 label_cur = rev_idx_label_entries[np.argmax( y_pred_entries[i_e][i_t_pad] )]
             else:
                 label_cur = 'INSIDE'
@@ -362,11 +368,18 @@ def train_ML( data_packed_file, json_out_file, logdir ):
     senses_labels = []
     for i_s in range( len( senses_tokens ) ):
 
+        n_tokens_in = len( senses_tokens[i_s] )
         sense_labels = []
-        for i_t in range( len( senses_tokens[i_s] ) ):
-            i_t_pad = i_t + len( y_pred_senses[i_s] ) - len( senses_tokens[i_s] )
+        for i_t in range( n_tokens_in ):
+
+            # take care of correct indices with regard to padding and max_sequence_len
+            if n_tokens_in <= senses_infos['max_sequence_len']:
+                i_t_pad = i_t + senses_infos['max_sequence_len'] - n_tokens_in
+            else:
+                i_t_pad = i_t
+
             # token_cur = senses_tokens[i_s][i_t]
-            if i_t < senses_infos['max_sequence_len']:
+            if i_t_pad < senses_infos['max_sequence_len']:
                 label_cur = rev_idx_label_senses[np.argmax( y_pred_senses[i_s][i_t_pad] )]
             else:
                 label_cur = 'INSIDE'
@@ -394,7 +407,7 @@ if __name__ == "__main__":
     # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_trained_debug.json'
     json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained.json'
 
-    logdir = "/home/jjug/logs/train_20200109"
+    logdir = "/home/jjug/logs/train_20200110"
     # logdir = ""
 
     jdata = train_ML( json_in_file, json_out_file, logdir )
