@@ -178,7 +178,8 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
     optim = RMSprop( lr=0.005 )
     model.compile( loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'] )
     best_acc = 0
-    best_model_path = '/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_' + dt + '.h5'
+    best_model_path = 'best_models/best_model_' + dt + '.h5'
+    # best_model_path = '/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_' + dt + '.h5'
     # DEBUG #
     # best_model_path = "/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_20191230-121243.h5"
     # model.load_weights( best_model_path )
