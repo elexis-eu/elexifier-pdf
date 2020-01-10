@@ -404,8 +404,8 @@ if __name__ == "__main__":
     # json_in_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_packed.json'
     json_in_file = '/home/jjug/data/slovarji/mali_sloang_packed.json'
 
-    # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_trained_debug.json'
-    json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained.json'
+    # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_trained.json'
+    json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained_2.json'
 
     logdir = "/home/jjug/logs/train_20200110"
     # logdir = ""
