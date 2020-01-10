@@ -293,6 +293,10 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
             token_cur = pages_tokens[i_p][i_t]
             label_cur = rev_idx_label_pages[np.argmax( y_pred_pages[i_p][i_t_pad] )]
+            page_labels.append( label_cur )
+
+            if label_cur == 'SCRAP':
+                continue
 
             if label_cur == 'ENTRY_START':
 
@@ -300,7 +304,6 @@ def train_ML( data_packed_file, json_out_file, logdir ):
                     entries_tokens.append( entry )
                 entry = []
 
-            page_labels.append( label_cur )
             entry.append( token_cur )
 
         pages_labels.append( page_labels )
@@ -345,13 +348,17 @@ def train_ML( data_packed_file, json_out_file, logdir ):
             else:
                 label_cur = 'INSIDE'
 
+            entry_labels.append( label_cur )
+
+            if 'SENSE' not in label_cur:
+                continue
+
             if label_cur == 'SENSE_START':
 
                 if len( sense ) != 0:
                     senses_tokens.append( sense )
                 sense = []
 
-            entry_labels.append( label_cur )
             sense.append( token_cur )
 
         entries_labels.append( entry_labels )
@@ -413,7 +420,7 @@ if __name__ == "__main__":
     json_in_file = '/home/jjug/data/slovarji/mali_sloang_packed.json'
 
     # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_trained.json'
-    json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained_2.json'
+    json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained_5.json'
 
     logdir = "/home/jjug/logs/train_20200110"
     # logdir = ""
