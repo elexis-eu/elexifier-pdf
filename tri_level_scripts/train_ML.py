@@ -279,10 +279,17 @@ def train_ML( data_packed_file, json_out_file, logdir ):
     entry = []
     for i_p in range( len( pages_tokens ) ):
 
-        page_labels = []
-        for i_t in range( len( pages_tokens[i_p] ) ):
+        n_tokens_in = len( pages_tokens[i_p] )
 
-            i_t_pad = i_t + len( y_pred_pages[i_p] ) - len( pages_tokens[i_p] )     # jump over the padded zeros
+        page_labels = []
+        for i_t in range( n_tokens_in ):
+
+            # take care of correct indices with regard to padding and max_sequence_len
+            if n_tokens_in <= pages_infos['max_sequence_len']:
+                i_t_pad = i_t + pages_infos['max_sequence_len'] - n_tokens_in
+            else:
+                i_t_pad = i_t
+
             token_cur = pages_tokens[i_p][i_t]
             label_cur = rev_idx_label_pages[np.argmax( y_pred_pages[i_p][i_t_pad] )]
 
