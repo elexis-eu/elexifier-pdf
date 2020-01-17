@@ -256,7 +256,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # train all 3 models
     data = json.load( open( data_packed_file, 'r' ) )
-    model_pages, pages_infos = train_on_data( data['pages'], n_rounds=8, verbose=True, logdir=logdir, batch_size=4 )
+    model_pages, pages_infos = train_on_data( data['level_1'], n_rounds=8, verbose=True, logdir=logdir, batch_size=4 )
     # DEBUG #
     # model_pages.load_weights( "/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_20191230-121243.h5" )
 
@@ -264,8 +264,8 @@ def train_ML( data_packed_file, json_out_file, logdir ):
     # predict on the rest of the data
 
     # 1.) pages level prediction
-    pages_tokens = data['unlabelled']
-    x_new = pages_tokens
+    level1_tokens = data['unlabelled']
+    x_new = level1_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, pages_infos['idx'], pages_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, pages_infos['max_sequence_len'] )
     x_new_chars_pad = [sequence.pad_sequences( seq, pages_infos['max_carray_len'] ) for seq in x_new_chars]
@@ -275,12 +275,12 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     y_pred_pages = model_pages.predict( X_new )
 
-    pages_labels = []
-    entries_tokens = []
+    level1_labels = []
+    level2_tokens = []
     entry = []
-    for i_p in range( len( pages_tokens ) ):
+    for i_p in range( len( level1_tokens ) ):
 
-        n_tokens_in = len( pages_tokens[i_p] )
+        n_tokens_in = len( level1_tokens[i_p] )
 
         page_labels = []
         for i_t in range( n_tokens_in ):
@@ -291,33 +291,33 @@ def train_ML( data_packed_file, json_out_file, logdir ):
             else:
                 i_t_pad = i_t
 
-            token_cur = pages_tokens[i_p][i_t]
+            token_cur = level1_tokens[i_p][i_t]
             label_cur = rev_idx_label_pages[np.argmax( y_pred_pages[i_p][i_t_pad] )]
             page_labels.append( label_cur )
 
-            if label_cur == 'SCRAP':
+            if label_cur == 'scrap':
                 continue
 
-            if label_cur == 'ENTRY_START':
+            if label_cur == 'entry_start':
 
                 if len( entry ) != 0:
-                    entries_tokens.append( entry )
+                    level2_tokens.append( entry )
                 entry = []
 
             entry.append( token_cur )
 
-        pages_labels.append( page_labels )
+        level1_labels.append( page_labels )
 
     if len( entry ) != 0:
-        entries_tokens.append( entry )
+        level2_tokens.append( entry )
 
 
 
     # 2.) entries level prediction
-    model_entries, entries_infos = train_on_data( data['entries'], n_rounds=8, verbose=True, logdir=logdir, batch_size=8 )
+    model_entries, entries_infos = train_on_data( data['level_2'], n_rounds=8, verbose=True, logdir=logdir, batch_size=8 )
     # DEBUG #
     # model_entries.load_weights( "/home/jan/PycharmProjects/cjvt-dev/elexifier-pdf/tri_level_scripts/best_model_20191227-153452.h5" )
-    x_new = entries_tokens
+    x_new = level2_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, entries_infos['idx'], entries_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, entries_infos['max_sequence_len'] )
     x_new_chars_pad = [sequence.pad_sequences( seq, entries_infos['max_carray_len'] ) for seq in x_new_chars]
@@ -327,12 +327,12 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     y_pred_entries = model_entries.predict( X_new )
 
-    entries_labels = []
-    senses_tokens = []
+    level2_labels = []
+    level3_tokens = []
     sense = []
     for i_e in range( len( y_pred_entries ) ):
 
-        n_tokens_in = len( entries_tokens[i_e] )
+        n_tokens_in = len( level2_tokens[i_e] )
         entry_labels = []
         for i_t in range( n_tokens_in ):
 
@@ -342,35 +342,35 @@ def train_ML( data_packed_file, json_out_file, logdir ):
             else:
                 i_t_pad = i_t
 
-            token_cur = entries_tokens[i_e][i_t]
+            token_cur = level2_tokens[i_e][i_t]
             if i_t_pad < entries_infos['max_sequence_len']:
                 label_cur = rev_idx_label_entries[np.argmax( y_pred_entries[i_e][i_t_pad] )]
             else:
-                label_cur = 'INSIDE'
+                label_cur = '0'
 
             entry_labels.append( label_cur )
 
-            if 'SENSE' not in label_cur:
+            if 'sense' not in label_cur:
                 continue
 
-            if label_cur == 'SENSE_START':
+            if label_cur == 'sense_start':
 
                 if len( sense ) != 0:
-                    senses_tokens.append( sense )
+                    level3_tokens.append( sense )
                 sense = []
 
             sense.append( token_cur )
 
-        entries_labels.append( entry_labels )
+        level2_labels.append( entry_labels )
 
     if len( sense ) != 0:
-        senses_tokens.append( sense )
+        level3_tokens.append( sense )
 
 
 
     # 3.) senses level prediction
-    model_senses, senses_infos = train_on_data( data['senses'], n_rounds=8, verbose=True, logdir=logdir, batch_size=8 )
-    x_new = senses_tokens
+    model_senses, senses_infos = train_on_data( data['level_3'], n_rounds=8, verbose=True, logdir=logdir, batch_size=8 )
+    x_new = level3_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, senses_infos['idx'], senses_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, senses_infos['max_sequence_len'] )
     x_new_chars_pad = [sequence.pad_sequences( seq, senses_infos['max_carray_len'] ) for seq in x_new_chars]
@@ -380,10 +380,10 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     y_pred_senses = model_senses.predict( X_new )
 
-    senses_labels = []
-    for i_s in range( len( senses_tokens ) ):
+    level3_labels = []
+    for i_s in range( len( level3_tokens ) ):
 
-        n_tokens_in = len( senses_tokens[i_s] )
+        n_tokens_in = len( level3_tokens[i_s] )
         sense_labels = []
         for i_t in range( n_tokens_in ):
 
@@ -393,18 +393,18 @@ def train_ML( data_packed_file, json_out_file, logdir ):
             else:
                 i_t_pad = i_t
 
-            # token_cur = senses_tokens[i_s][i_t]
+            # token_cur = level3_tokens[i_s][i_t]
             if i_t_pad < senses_infos['max_sequence_len']:
                 label_cur = rev_idx_label_senses[np.argmax( y_pred_senses[i_s][i_t_pad] )]
             else:
-                label_cur = 'INSIDE'
+                label_cur = '0'
             sense_labels.append( label_cur )
 
-        senses_labels.append( sense_labels )
+        level3_labels.append( sense_labels )
 
-    json_data = {'page_level': (pages_tokens, pages_labels) ,
-                 'entry_level': (entries_tokens, entries_labels),
-                 'sense_level': (senses_tokens, senses_labels)
+    json_data = {'level_1': (level1_tokens, level1_labels) ,
+                 'level_2': (level2_tokens, level2_labels),
+                 'level_3': (level3_tokens, level3_labels)
                 }
 
     json.dump( json_data, open( json_out_file, 'w' ), indent=4 )
@@ -417,12 +417,16 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 if __name__ == "__main__":
 
     # json_in_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_packed.json'
-    json_in_file = '/home/jjug/data/slovarji/mali_sloang_packed.json'
+    # json_in_file = '/media/jan/Fisk/CJVT/outputs/json/srbslo_2_kor_packed.json'
+    # json_in_file = '/home/jjug/data/slovarji/mali_sloang_packed.json'
+    json_in_file = '/home/jjug/data/slovarji/srbslo_2_kor_packed.json'
 
     # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_trained.json'
-    json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained_5.json'
+    # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/srbslo_2_kor_trained.json'
+    # json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained_5.json'
+    json_out_file = '/home/jjug/data/slovarji/srbslo_2_kor_trained.json'
 
-    logdir = "/home/jjug/logs/train_20200110"
+    logdir = "/home/jjug/logs/train_20200117"
     # logdir = ""
 
     jdata = train_ML( json_in_file, json_out_file, logdir )
