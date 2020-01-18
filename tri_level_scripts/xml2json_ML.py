@@ -335,25 +335,25 @@ def xml2json( xml_raw_file, xml_lex_file, container_structure, json_out_file ):
 if __name__ == "__main__":
 
     # inputs
-    # xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/mali_sloang_pred_prelomom-20-pages.xml'
-    # xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/mali_sloang_pred_prelomom-annotated.xml'
+    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/mali_sloang_pred_prelomom-20-pages.xml'
+    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/mali_sloang_pred_prelomom-annotated.xml'
     # xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/sloita_proba5a-20-pages.xml'
     # xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/sloita_proba5a-annotated.xml'
-    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/srbslo_2_kor-20-pages.xml'
-    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/srbslo_2_kor-annotated.xml'
+    # xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/srbslo_2_kor-20-pages.xml'
+    # xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/srbslo_2_kor-annotated.xml'
 
     # structures, count  = get_all_container_structures( xml_lex )
-    container_structure = [['entry'], ['form', 'pos', 'sense'], ['translation']]
-    # container_structure = [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
+    # container_structure = [['entry'], ['form', 'pos', 'sense'], ['translation']]
+    container_structure = [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
 
     # outputs
     # json_pages = '/media/jan/Fisk/CJVT/outputs/json/irish_pages.json'
     # json_entries = '/media/jan/Fisk/CJVT/outputs/json/irish_entries.json'
     # json_senses = '/media/jan/Fisk/CJVT/outputs/json/irish_senses.json'
     # json_unlabelled = '/media/jan/Fisk/CJVT/outputs/json/irish_unlabeled.json'
-    # json_out = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_packed_new.json'
+    json_out = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_packed_final.json'
     # json_out = '/media/jan/Fisk/CJVT/outputs/json/sloita_proba5a_packed.json'
-    json_out = '/media/jan/Fisk/CJVT/outputs/json/srbslo_2_kor_packed.json'
+    # json_out = '/media/jan/Fisk/CJVT/outputs/json/srbslo_2_kor_packed.json'
 
     json_d = xml2json( xml_raw, xml_lex, container_structure, json_out )
 
