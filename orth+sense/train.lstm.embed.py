@@ -113,12 +113,12 @@ def one_hot_and_chars(dataset, idx={}, idx_c={}):
     chars_dataset.append(char_arrays_sequence)
   return oh_dataset, chars_dataset, idx
 
-# all_tokens, idx_t, _ = extract_tokens(X_train)
-# X_train_oh, X_train_tokens, idx = one_hot(X_train, idx_t=idx_t)
-# X_test_oh, X_test_tokens, _ = one_hot(X_test, idx, idx_t)
-all_tokens, idx_t, idx_c = extract_tokens(X_train)
-X_train_oh, X_train_chars, idx = one_hot_and_chars(X_train, idx_c=idx_c)
-X_test_oh, X_test_chars, _ = one_hot_and_chars(X_test, idx, idx_c)
+all_tokens, idx_t, _ = extract_tokens(X_train)
+X_train_oh, X_train_tokens, idx = one_hot(X_train, idx_t=idx_t)
+X_test_oh, X_test_tokens, _ = one_hot(X_test, idx, idx_t)
+# all_tokens, idx_t, idx_c = extract_tokens(X_train)
+# X_train_oh, X_train_chars, idx = one_hot_and_chars(X_train, idx_c=idx_c)
+# X_test_oh, X_test_chars, _ = one_hot_and_chars(X_test, idx, idx_c)
 #print to_categorical(train[0][1])
 
 
@@ -143,29 +143,29 @@ def one_hot_target(dataset,idx={}):
 max_sequence_len=max([len(e) for e in X_train_oh])*2
 #print max_sequence_len
 X_train_oh=sequence.pad_sequences(X_train_oh,max_sequence_len)
-# X_train_tokens = sequence.pad_sequences(X_train_tokens, max_sequence_len)
+X_train_tokens = sequence.pad_sequences(X_train_tokens, max_sequence_len)
 
-max_carray_len = 0
-for seq in X_train_chars:
-  max_cur = max([len(arr) for arr in seq])
-  if max_cur > max_carray_len:
-    max_carray_len = max_cur
-max_carray_len *= 2
-X_train_chars_pad = [sequence.pad_sequences(seq, max_carray_len) for seq in X_train_chars]
-X_train_chars = sequence.pad_sequences(X_train_chars_pad, max_sequence_len)
+# max_carray_len = 0
+# for seq in X_train_chars:
+#   max_cur = max([len(arr) for arr in seq])
+#   if max_cur > max_carray_len:
+#     max_carray_len = max_cur
+# max_carray_len *= 2
+# X_train_chars_pad = [sequence.pad_sequences(seq, max_carray_len) for seq in X_train_chars]
+# X_train_chars = sequence.pad_sequences(X_train_chars_pad, max_sequence_len)
 
 X_test_nonpad=X_test_oh[:]
 X_test_oh=sequence.pad_sequences(X_test_oh,max_sequence_len)
-# X_test_tokens = sequence.pad_sequences(X_test_tokens, max_sequence_len)
-X_test_chars_pad = [sequence.pad_sequences(seq, max_carray_len) for seq in X_test_chars]
-X_test_chars = sequence.pad_sequences(X_test_chars_pad, max_sequence_len)
+X_test_tokens = sequence.pad_sequences(X_test_tokens, max_sequence_len)
+# X_test_chars_pad = [sequence.pad_sequences(seq, max_carray_len) for seq in X_test_chars]
+# X_test_chars = sequence.pad_sequences(X_test_chars_pad, max_sequence_len)
 
 print("X_train_oh.shape", X_train_oh.shape)
-# print("X_train_tokens.shape", X_train_tokens.shape)
-print("X_train_chars.shape", X_train_chars.shape)
+print("X_train_tokens.shape", X_train_tokens.shape)
+# print("X_train_chars.shape", X_train_chars.shape)
 print("X_test_oh.shape", X_test_oh.shape)
-# print("X_test_tokens.shape", X_test_tokens.shape)
-print("X_test_chars.shape", X_test_chars.shape)
+print("X_test_tokens.shape", X_test_tokens.shape)
+# print("X_test_chars.shape", X_test_chars.shape)
 y_train_oh,idx_label=one_hot_target(y_train)
 y_test_oh,_=one_hot_target(y_test,idx_label)
 y_train_oh=sequence.pad_sequences(y_train_oh,max_sequence_len)
@@ -188,27 +188,27 @@ print("Data preparation time:", (t1-t0), "s")
 # model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 
 # embedded tokens
-# tokens_input = Input(shape=(max_sequence_len,))
-# features_input = Input(shape=(max_sequence_len, len(idx)))
-# tokens_masked = Masking(0) (tokens_input)
-# features_masked = Masking(0) (features_input)
-# tokens_embed = Embedding(int((2/3)*len(idx_t)), 10, input_length=max_sequence_len) (tokens_masked)
-# tokens_embed = Dropout(0.5) (tokens_embed)
-# features_merged = Concatenate(axis=-1) ([features_masked, tokens_embed])
-
+tokens_input = Input(shape=(max_sequence_len,))
 features_input = Input(shape=(max_sequence_len, len(idx)))
-chars_input = Input(shape=(max_sequence_len, max_carray_len))
-chars_masked = Masking(0) (chars_input)
+tokens_masked = Masking(0) (tokens_input)
 features_masked = Masking(0) (features_input)
-chars_embed = Bidirectional(LSTM(5, return_sequences=True)) (chars_masked)
-# chars_embed = Dropout(0.5) (chars_embed)
-features_merged = Concatenate(axis=-1) ([features_masked, chars_embed])
+tokens_embed = Embedding(int((2/3)*len(idx_t)), 10, input_length=max_sequence_len) (tokens_masked)
+tokens_embed = Dropout(0.5) (tokens_embed)
+features_merged = Concatenate(axis=-1) ([features_masked, tokens_embed])
+
+# features_input = Input(shape=(max_sequence_len, len(idx)))
+# chars_input = Input(shape=(max_sequence_len, max_carray_len))
+# chars_masked = Masking(0) (chars_input)
+# features_masked = Masking(0) (features_input)
+# chars_embed = Bidirectional(LSTM(5, return_sequences=True)) (chars_masked)
+# # chars_embed = Dropout(0.5) (chars_embed)
+# features_merged = Concatenate(axis=-1) ([features_masked, chars_embed])
 
 h = Bidirectional(LSTM(12, return_sequences=True)) (features_merged)
 # h = Dropout(0.5) (h)
 y = TimeDistributed(Dense(len(idx_label), activation='softmax')) (h)
-# model = Model(inputs=[features_input, tokens_input], outputs=y)
-model = Model(inputs=[features_input, chars_input], outputs=y)
+model = Model(inputs=[features_input, tokens_input], outputs=y)
+# model = Model(inputs=[features_input, chars_input], outputs=y)
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 
 print(model.summary())
@@ -219,15 +219,15 @@ for i in range(n_rounds):
   t_r0 = time()
   # model.fit(X_train_oh, y_train_oh, batch_size=4, epochs=10, validation_data=(X_test_oh, y_test_oh), shuffle=True)
   # score, acc = model.evaluate(X_test_oh, y_test_oh, batch_size=50)
-  # model.fit([X_train_oh, X_train_tokens], y_train_oh, batch_size=4, epochs=10, validation_data=([X_test_oh, X_test_tokens], y_test_oh), shuffle=True)
-  # score, acc = model.evaluate([X_test_oh,X_test_tokens], y_test_oh, batch_size=50)
-  model.fit([X_train_oh, X_train_chars], y_train_oh, batch_size=5, epochs=10, validation_data=([X_test_oh, X_test_chars], y_test_oh), shuffle=True)
-  score, acc = model.evaluate([X_test_oh,X_test_chars], y_test_oh, batch_size=50)
+  model.fit([X_train_oh, X_train_tokens], y_train_oh, batch_size=4, epochs=10, validation_data=([X_test_oh, X_test_tokens], y_test_oh), shuffle=True)
+  score, acc = model.evaluate([X_test_oh,X_test_tokens], y_test_oh, batch_size=50)
+  # model.fit([X_train_oh, X_train_chars], y_train_oh, batch_size=5, epochs=10, validation_data=([X_test_oh, X_test_chars], y_test_oh), shuffle=True)
+  # score, acc = model.evaluate([X_test_oh,X_test_chars], y_test_oh, batch_size=50)
 
 
   # y_test_pred=model.predict(X_test_oh)
-  # y_test_pred=model.predict([X_test_oh, X_test_tokens])
-  y_test_pred=model.predict([X_test_oh, X_test_chars])
+  y_test_pred=model.predict([X_test_oh, X_test_tokens])
+  # y_test_pred=model.predict([X_test_oh, X_test_chars])
 
   def to_tags(sequence):
     result=[]

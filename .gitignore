@@ -1,0 +1,5 @@
+*/__pycache__/*
+*.log
+*/logs/*
+/venv/*
+*/best_models/*
