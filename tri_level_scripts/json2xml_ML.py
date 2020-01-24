@@ -79,6 +79,7 @@ def json2xml( json_in_file, xml_raw, xml_out_file ):
 
     # # doc_elm = ET.Element( 'document' )
     body_elm = ET.Element( 'body' )
+    # current elements by level
     cur_elm_lvl1 = None
     cur_elm_lvl2 = None
     cur_elm_lvl3 = None

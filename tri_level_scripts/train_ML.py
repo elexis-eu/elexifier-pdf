@@ -13,17 +13,6 @@ import os
 
 
 
-# parser=argparse.ArgumentParser()
-# parser.add_argument('-p', '--percentage', help='percentage of the training data to be used', type=float, default=1.0)
-# parser.add_argument('-v', '--verbose', action='store_true')
-# parser.add_argument('-nr', '--n_rounds', help='number of repetitions of 10 epoch training', type=int, default=10)
-# parser.add_argument('-ld', '--logdir', help='directory where the log file will be stored', type=str, default="")
-# args = parser.parse_args()
-
-
-
-
-
 def extract_tokens( dataset ):
     tokens = set()
     chars = set()
@@ -118,7 +107,7 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len ):
 
 
 
-def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5 ):
+def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
 
     dt = datetime.now().strftime( "%Y%m%d-%H%M%S" )
     logfile = None
@@ -177,12 +166,14 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
 #    optim = SGD( lr=0.01, momentum=0.9, nesterov=True )
     optim = RMSprop( lr=0.005 )
     model.compile( loss='categorical_crossentropy', optimizer=optim, metrics=['accuracy'] )
-    best_acc = 0
-    best_model_path = 'best_models/best_model_' + dt + '.h5'
+    # best_acc = 0
+    # best_model_path = 'best_models/best_model_' + dt + '.h5'
     # best_model_path = '/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_' + dt + '.h5'
+
     # DEBUG #
     # best_model_path = "/media/jan/Fisk/CJVT/models/pipeline_debug/best_model_20191230-121243.h5"
     # model.load_weights( best_model_path )
+    # /DEBUG #
 
     t1 = time()
     for i_round in range(n_rounds):
@@ -191,11 +182,11 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
         t_r0 = time()
 
         h = model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
-        score, acc = model.evaluate( X_test, y_test_oh, batch_size=5 )
-        if acc > best_acc:
-            print( "best model accuracy,", acc, ", saving..." )
-            best_acc = acc
-            model.save_weights( best_model_path )
+        # score, acc = model.evaluate( X_test, y_test_oh, batch_size=5 )
+        # if acc > best_acc:
+        #     print( "best model accuracy,", acc, ", saving..." )
+        #     best_acc = acc
+        #     model.save_weights( best_model_path )
 
         if verbose:
             y_test_pred = model.predict( X_test )
@@ -246,7 +237,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="logs/", batch_size=5
                 lf.close()
 
     # in the end load the model with the best score
-    model.load_weights( best_model_path )
+    # model.load_weights( best_model_path )
     if verbose: print("Training time:", (time()-t1), "s")
     return model, data_infos
 
