@@ -147,6 +147,15 @@ def json2xml( json_in_file, xml_raw, xml_out_file ):
 
 
 
+
+
+### The following main stub demonstrates the usage of this script. There are 3 variables to be specified:
+#       - json_ml_results_file: path to .json file containing the results set prepared by the functions in train_ML.py
+#       - xml_raw_file: path to .xml file containing the raw pdf2xml transformation. Only tokens inside with all the
+#       attributes. This is the same raw file as used in the first step, xml2json_ML.py
+#       - xml_out_file: path to final result of the ML pipeline: .xml file in lexonomy format, meaning tokens
+#       encapsulated in containers specifying the different layers of dictionary entries.
+
 if __name__ == "__main__":
 
     # input (output from train_ML script)

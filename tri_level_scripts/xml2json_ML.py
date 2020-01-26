@@ -370,12 +370,24 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
 
 
 
+
+### The following main stub demonstrates the usage of this script. There are 3 variables to be specified:
+#       - xml_raw: path to .xml file containing the raw pdf2xml transformation. Only tokens inside with all the attributes.
+#       - xml_lex: path to .xml file containing the annotation from Lexonomy. Tokens encapsulated in containers which
+#       serve as true labels for ML.
+#       - json_out: path to where the JSON of the prepared dataset for ML training will be saved. Ensure all directories
+#       on the path exist.
+#
+#       - approved_structures: parameter containing acceptable structures of containers. Container structures that do
+#       not conform to a structure listed int his list will be discarded.
+
+
 if __name__ == "__main__":
 
-    # inputs (raw and annotated .xml file paths)
+    # inputs
     xml_raw = ''
     xml_lex = ''
-    # output (input into train_ML script)
+    # output
     json_out = ''
 
     # structures, count  = get_all_container_structures( xml_lex )
