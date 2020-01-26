@@ -2,14 +2,14 @@ import os
 import xml.etree.ElementTree as ET
 
 # first extract the dictionary xml TOKENs
-dict_xml = '/media/jan/Fisk/CJVT/data/dicts_xml_november/Bridge_A-AG_clean_aligned.xml'
+dict_xml = 'path/to//Bridge_A-AG_clean_aligned.xml'
 tree_dict = ET.parse(dict_xml)
 root_dict = tree_dict.getroot()
 tokens_dict = list(root_dict.iter('TOKEN'))
 
 # then extract all the annotated TOKENs
 tokens_entries = []
-annotated_dir = '/home/jan/PycharmProjects/cjvt/tokenizer/dictScrap_cleaned'
+annotated_dir = 'path/to/dir'
 for i in range(310):
     entry_xml = os.path.join(annotated_dir, 'entry_{}.xml'.format(i))
     try:

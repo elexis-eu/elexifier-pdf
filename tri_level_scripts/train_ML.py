@@ -424,8 +424,8 @@ if __name__ == "__main__":
     json_in_file = ''
     # output file path (input into json2xml_ML script)
     json_out_file = ''
-    # log file path
-    logdir = ""
+    # log directory path
+    logdir = ''
 
     jdata = train_ML( json_in_file, json_out_file, logdir )
 
