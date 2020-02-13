@@ -3,6 +3,8 @@ import json
 
 
 def json2xml( json_in_file, xml_raw, xml_out_file ):
+    # Constructs final .xml file from the output of train_ML script and with tokens from raw .xml file, and output into
+    # file at <xml_file_out>.
 
     json_data = json.load( open( json_in_file, 'r' ) )
 
@@ -77,8 +79,9 @@ def json2xml( json_in_file, xml_raw, xml_out_file ):
         token_labels.append( label_cur )
         i_t_lvl1 += 1
 
-    # # doc_elm = ET.Element( 'document' )
+    # construct XML tree based on labels for each token
     body_elm = ET.Element( 'body' )
+    # current elements by level
     cur_elm_lvl1 = None
     cur_elm_lvl2 = None
     cur_elm_lvl3 = None
@@ -135,7 +138,7 @@ def json2xml( json_in_file, xml_raw, xml_out_file ):
             cur_elm_lvl1.append( token_r )
 
 
-
+    # saved the constructed XML tree into the output .xml file
     xml_string = ET.tostring( body_elm, encoding='unicode', method='xml' )
     with open( xml_out_file, 'w' ) as f:
         f.write( xml_string )
@@ -144,20 +147,25 @@ def json2xml( json_in_file, xml_raw, xml_out_file ):
 
 
 
+
+
+### The following main stub demonstrates the usage of this script. There are 3 variables to be specified:
+#       - json_ml_results_file: path to .json file containing the results set prepared by the functions in train_ML.py
+#       - xml_raw_file: path to .xml file containing the raw pdf2xml transformation. Only tokens inside with all the
+#       attributes. This is the same raw file as used in the first step, xml2json_ML.py
+#       - xml_out_file: path to final result of the ML pipeline: .xml file in lexonomy format, meaning tokens
+#       encapsulated in containers specifying the different layers of dictionary entries.
+
 if __name__ == "__main__":
 
-    # json_ml_results_file = '/media/jan/Fisk/CJVT/outputs/json/predicted_data/mali_sloang_trained_final.json'
-    # json_ml_results_file = '/media/jan/Fisk/CJVT/outputs/json/predicted_data/sloita_proba5a_trained.json'
-    json_ml_results_file = '/media/jan/Fisk/CJVT/outputs/json/predicted_data/srbslo_2_kor_trained.json'
+    # input (output from train_ML script)
+    json_ml_results_file = ''
+    # input (raw .xml file path)
+    xml_raw_file = ''
 
-    # xml_raw_file = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/mali_sloang_pred_prelomom-20-pages.xml'
-    # xml_raw_file = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/sloita_proba5a-20-pages.xml'
-    xml_raw_file = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/srbslo_2_kor-20-pages.xml'
+    # output file path
+    xml_out_file = ''
 
-    # xml_out_file = '/media/jan/Fisk/CJVT/outputs/json/predicted_data/mali_sloang_out_final.xml'
-    # xml_out_file = '/media/jan/Fisk/CJVT/outputs/json/predicted_data/sloita_proba5a_out.xml'
-    xml_out_file = '/media/jan/Fisk/CJVT/outputs/json/predicted_data/srbslo_2_kor_out.xml'
-
-    json2xml( json_ml_results_file, xml_raw_file, xml_out_file )
+    xml_str = json2xml( json_ml_results_file, xml_raw_file, xml_out_file )
 
 

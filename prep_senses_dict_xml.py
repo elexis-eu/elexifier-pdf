@@ -20,14 +20,12 @@ def pos_def_or_quote(e, parent_map):
 
 
 
-# dict_xml = '/media/jan/Fisk/CJVT/data/dicts_xml_november/Bridge_A-AG_clean_aligned.xml'
-dict_xml = '/media/south/Data/CJVT_data/data/dicts_xml_november/Bridge_A-AG_clean_aligned.xml'
+dict_xml = 'path/to/Bridge_A-AG_clean_aligned.xml'
 tree_dict = ET.parse(dict_xml)
 root_dict = tree_dict.getroot()
 tokens_dict = list(root_dict.iter('TOKEN'))
 
-# annotated_dir = '/home/jan/PycharmProjects/cjvt/tokenizer/dictScrap_cleaned'
-annotated_dir = '/media/south/Data/CJVT_data/data/dictScrap_cleaned'
+annotated_dir = 'path/to/dir'
 idx_dict_t = 0
 senses_data = []
 for i in range(310):
@@ -66,6 +64,5 @@ for i in range(310):
         print("error in file " + entry_xml)
         continue
 
-# json_file = '/media/jan/Fisk/CJVT/outputs/json/senses_data.json'
-json_file = '/media/south/Data/CJVT_data/outputs/json/senses_data.json'
+json_file = 'path/to/senses_data.json'
 json.dump(senses_data, open(json_file, 'w'), indent=4)

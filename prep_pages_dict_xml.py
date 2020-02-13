@@ -2,13 +2,13 @@ import xml.etree.ElementTree as ET
 import json
 import os
 
-dict_xml = '/media/jan/Fisk/CJVT/data/dicts_xml_november/Bridge_A-AG_clean_aligned.xml'
+dict_xml = 'path/to/Bridge_A-AG_clean_aligned.xml'
 tree_dict = ET.parse(dict_xml)
 root_dict = tree_dict.getroot()
 tokens_dict = list(root_dict.iter('TOKEN'))
 
 tokens_annot = []
-annotated_dir = '/home/jan/PycharmProjects/cjvt/tokenizer/dictScrap_cleaned'
+annotated_dir = 'path/to/dir'
 for i in range(310):
     entry_xml = os.path.join(annotated_dir, 'entry_{}.xml'.format(i))
     try:
@@ -53,6 +53,6 @@ for idx, token in enumerate(tokens_dict):
     feats.append(feat)
     labels.append(label)
 
-json_file = '/media/jan/Fisk/CJVT/outputs/json/pages_data.json'
+json_file = 'path/to/pages_data.json'
 json.dump(pages_data,open(json_file,'w'),indent=4)
 
