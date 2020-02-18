@@ -236,8 +236,8 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
                 entry_cur = cntr
                 break
 
-        # check if current entry was already identified as faulty
-        if entry_cur in entries_blacklist:
+        # if entry not found or if current entry was already identified as faulty, continue
+        if entry_cur is None or entry_cur in entries_blacklist:
             continue
 
         # check if current entry structure is faulty
@@ -391,22 +391,22 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
 if __name__ == "__main__":
 
     # inputs
-    xml_raw = ''
-    xml_lex = ''
+    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_february/examples/srbslo_pdf.xml'
+    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_february/examples/srbslo.xml'
     # output
-    json_out = ''
+    json_out = 'out.json'
 
-    # structures, count  = get_all_container_structures( xml_lex )
+    structures, count  = get_all_container_structures( xml_lex )
     # # examples of container_structure parameter
     # container_structure = [['entry'], ['form', 'pos', 'sense'], ['translation']]
     # container_structure = [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
     # example of approved_structures parameter
-    approved_structures = [
-        [['entry'], ['form', 'pos', 'sense'], ['translation']],
-        [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
-    ]
-
-    json_d = xml2json( xml_raw, xml_lex, approved_structures, json_out )
+    # approved_structures = [
+    #     [['entry'], ['form', 'pos', 'sense'], ['translation']],
+    #     [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
+    # ]
+    #
+    # json_d = xml2json( xml_raw, xml_lex, approved_structures, json_out )
 
 
 
