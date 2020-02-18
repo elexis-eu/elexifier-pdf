@@ -223,6 +223,12 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
             containers_cur.append( container )
             container = get_parent_container( container, parent_map )
 
+        # if token not in any container, label it as scrap and continue
+        if len( containers_cur ) == 0:
+            feats_lvl1.append( feat )
+            labels_lvl1.append( 'scrap' )
+            continue
+
         # find the base (lowest level) entry container
         entry_cur = None
         for cntr in containers_cur:
