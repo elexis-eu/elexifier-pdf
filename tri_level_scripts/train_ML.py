@@ -418,15 +418,17 @@ if __name__ == "__main__":
 
     # json_in_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_packed.json'
     # json_in_file = '/media/jan/Fisk/CJVT/outputs/json/srbslo_2_kor_packed.json'
-    # json_in_file = '/home/jjug/data/slovarji/mali_sloang_packed.json'
-    json_in_file = '/home/jjug/data/slovarji/srbslo_2_kor_packed.json'
+    json_in_file = '/home/jjug/data/slovarji/mali_sloang_packed_final.json'
+    # json_in_file = '/home/jjug/data/slovarji/srbslo_2_kor_packed.json'
+    # json_in_file = '/home/jjug/data/slovarji/sloita_proba5a_packed.json'
 
     # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_trained.json'
     # json_out_file = '/media/jan/Fisk/CJVT/outputs/json/srbslo_2_kor_trained.json'
-    # json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained_5.json'
-    json_out_file = '/home/jjug/data/slovarji/srbslo_2_kor_trained.json'
+    json_out_file = '/home/jjug/data/slovarji/mali_sloang_trained_final.json'
+    # json_out_file = '/home/jjug/data/slovarji/srbslo_2_kor_trained.json'
+    # json_out_file = '/home/jjug/data/slovarji/sloita_proba5a_trained.json'
 
-    logdir = "/home/jjug/logs/train_20200117"
+    logdir = "/home/jjug/logs/train_20200118"
     # logdir = ""
 
     jdata = train_ML( json_in_file, json_out_file, logdir )
