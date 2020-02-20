@@ -4,6 +4,8 @@ import json
 
 
 def get_parent_container( e, parent_map ):
+    # Gets the first ancestor element of an element e that has tag 'container'
+
     # avoid self
     if e.tag.lower() == 'container':
         if e not in parent_map.keys():
@@ -19,6 +21,8 @@ def get_parent_container( e, parent_map ):
 
 
 def construct_containers_map( root, parent_map ):
+    # Construct a map of containers: each container gets a list of all containers it's a descendant of.
+
     containers = list( root.iter( 'container' ) )
     containers_map = {}
 
@@ -26,7 +30,6 @@ def construct_containers_map( root, parent_map ):
         # sometimes empty containers appear; skip those
         if len( list( cntnr.iter( 'TOKEN' ) ) ) == 0:
             continue
-
         parents_cur = []
         parent_cntnr = get_parent_container( cntnr, parent_map )
         while parent_cntnr is not None:
@@ -38,7 +41,10 @@ def construct_containers_map( root, parent_map ):
 
 
 
-def get_container_structure( container, level, structure ):
+def get_container_structure( container, level=0, structure=[] ):
+    # Construct a container structure as a list of lists: each list within the structure denotes a level.
+    # Recursive function.
+
     if len( structure ) <= level:
         structure.append( [] )
     if container.attrib['name'] not in structure[level]:
@@ -54,6 +60,8 @@ def get_container_structure( container, level, structure ):
 
 
 def get_all_container_structures( xml_lex_file ):
+    # Return all structures of containers and their counts within an xml file.
+
     tree_lex = ET.parse( xml_lex_file )
     parent_map = {c:p for p in tree_lex.iter() for c in p}
     root_lex = tree_lex.getroot()
@@ -83,8 +91,10 @@ def get_all_container_structures( xml_lex_file ):
 
 
 def add_senses_where_missing( tree_lex, entry_level_structure ):
-    # this function is not the best, because it can change the order of TOKENs in some circumstances, which is not
+    # Envelop senses into 'sense' containers in entries where senses are missing.
+    # NOTE: this function is not the best, because it can change the order of TOKENs in some circumstances, which is not
     # desirable. See note below.
+    # This function is deprecated as of 2020 01 24
 
     parent_map = {c: p for p in tree_lex.iter() for c in p}
     root_lex = tree_lex.getroot()
@@ -128,7 +138,7 @@ def add_senses_where_missing( tree_lex, entry_level_structure ):
         # for child in children_to_move:
         #     sense_container.append( child )
 
-        # PART SOLUTION: move into sense only the TOKENs and sense-level containers that come after the last entry-level
+        # TEMP SOLUTION: move into sense only the TOKENs and sense-level containers that come after the last entry-level
         # container
         sense_container = ET.SubElement( entry, 'container', attrib={'name': 'sense'} )
         for ich, child in enumerate( children_to_move ):
@@ -142,23 +152,24 @@ def add_senses_where_missing( tree_lex, entry_level_structure ):
 
 
 
+def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
+    # Prepare a JSON training dataset from a raw .xml and an annotated .xml file, filtering and accepting only container
+    # structures that are present in the <approved_structures> parameter. Saves output into <json_out_file>
 
-
-def xml2json( xml_raw_file, xml_lex_file, container_structure, json_out_file ):
-
+    # load raw xml file
     tree_raw = ET.parse( xml_raw_file )
     root_raw = tree_raw.getroot()
     tokens_raw = list( root_raw.iter( 'TOKEN' ) )
 
+    # load annotated xml file
     tree_lex = ET.parse( xml_lex_file )
-    tree_lex = add_senses_where_missing( tree_lex, container_structure[1] )
-
+    # tree_lex = add_senses_where_missing( tree_lex, container_structure[1] ) ## deprecated
     root_lex = tree_lex.getroot()
     tokens_lex = list( root_lex.iter( 'TOKEN' ) )
     parent_map = {c: p for p in tree_lex.iter() for c in p}
     containers_map = construct_containers_map( root_lex, parent_map )
 
-    # prepare variables and
+    # prepare variables
     data_lvl1 = []
     data_lvl2 = []
     data_lvl3 = []
@@ -169,8 +180,11 @@ def xml2json( xml_raw_file, xml_lex_file, container_structure, json_out_file ):
     labels_lvl2 = []
     labels_lvl3 = []
 
+    # previous base element for deeper levels
     prev_entry = None
     prev_sense = None
+
+    entries_blacklist = []  # blacklist for entries whose structure does not conform to specifications
 
     page_n = int( tokens_raw[0].attrib['page'] )
     line_n = 0
@@ -202,27 +216,57 @@ def xml2json( xml_raw_file, xml_lex_file, container_structure, json_out_file ):
             line_n = line_token
 
 
-        # collect all the containers
-        containers_token = []
+        # collect all the containers of current token
+        containers_cur = []
         container = get_parent_container( token_a, parent_map )
         while container is not None:
-            containers_token.append( container )
+            containers_cur.append( container )
             container = get_parent_container( container, parent_map )
 
-        # perform check if container structure is correct:
-        containers_by_lvl = [None, None, None]
-        structure_correct = True
-        for cntr in containers_token:
-            cntr_lvl = len( containers_map[cntr] )
-            if cntr_lvl >= len( container_structure ) or cntr.attrib['name'] not in container_structure[cntr_lvl]:
-                structure_correct = False
-                break
-            else:
-                containers_by_lvl[cntr_lvl] = cntr
-
-        # if there was a problem with the structure, skip current token for training data
-        if not structure_correct:
+        # if token not in any container, label it as scrap and continue
+        if len( containers_cur ) == 0:
+            feats_lvl1.append( feat )
+            labels_lvl1.append( 'scrap' )
             continue
+
+        # find the base (lowest level) entry container
+        entry_cur = None
+        for cntr in containers_cur:
+            if cntr.attrib['name'] == 'entry' and len( containers_map[cntr] ) == 0:
+                entry_cur = cntr
+                break
+
+        # if entry not found or if current entry was already identified as faulty, continue
+        if entry_cur is None or entry_cur in entries_blacklist:
+            continue
+
+        # check if current entry structure is faulty
+        structure_cur = get_container_structure( entry_cur )
+        if structure_cur not in approved_structures:
+            entries_blacklist.append( entry_cur )
+            continue
+
+        # # perform check if container structure is correct:
+        # # DEPRECATED: only useful when there is only one possible container_structure
+        # containers_by_lvl = [None, None, None]
+        # structure_correct = True
+        # for cntr in containers_cur:
+        #     cntr_lvl = len( containers_map[cntr] )
+        #     if cntr_lvl >= len( container_structure ) or cntr.attrib['name'] not in container_structure[cntr_lvl]:
+        #         structure_correct = False
+        #         break
+        #     else:
+        #         containers_by_lvl[cntr_lvl] = cntr
+        #
+        # # if there was a problem with the structure, skip current token for training data
+        # if not structure_correct:
+        #     continue
+
+        # identify containers of current token by level
+        containers_by_lvl = [None, None, None]
+        for cntr in containers_cur:
+            cntr_lvl = len( containers_map[cntr] )
+            containers_by_lvl[cntr_lvl] = cntr
 
         # page level labels
         if containers_by_lvl[0] is not None:
@@ -276,7 +320,7 @@ def xml2json( xml_raw_file, xml_lex_file, container_structure, json_out_file ):
                 labels_lvl2.append( label_lvl2 )
                 prev_entry = entry
 
-            else:   # if level 1 container is not an entry
+            else:   # if level 1 container is not an entry (by some possible structures)
                 label_lvl1 = containers_by_lvl[0].attrib['name']
 
         else:   # if token has no container
@@ -319,7 +363,7 @@ def xml2json( xml_raw_file, xml_lex_file, container_structure, json_out_file ):
         feats_lvl1.append( feat )
         page_n = page_token
 
-
+    # save the data dictionary
     unlabelled_pages.append( feats_lvl1 )
     json_dict = {'level_1' : data_lvl1,
                  'level_2' : data_lvl2,
@@ -332,30 +376,37 @@ def xml2json( xml_raw_file, xml_lex_file, container_structure, json_out_file ):
 
 
 
+
+### The following main stub demonstrates the usage of this script. There are 3 variables to be specified:
+#       - xml_raw: path to .xml file containing the raw pdf2xml transformation. Only tokens inside with all the attributes.
+#       - xml_lex: path to .xml file containing the annotation from Lexonomy. Tokens encapsulated in containers which
+#       serve as true labels for ML.
+#       - json_out: path to where the JSON of the prepared dataset for ML training will be saved. Ensure all directories
+#       on the path exist.
+#
+#       - approved_structures: parameter containing acceptable structures of containers. Container structures that do
+#       not conform to a structure listed int his list will be discarded.
+
+
 if __name__ == "__main__":
 
     # inputs
-    # xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/mali_sloang_pred_prelomom-20-pages.xml'
-    # xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/mali_sloang_pred_prelomom-annotated.xml'
-    # xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/sloita_proba5a-20-pages.xml'
-    # xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/sloita_proba5a-annotated.xml'
-    xml_raw = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/srbslo_2_kor-20-pages.xml'
-    xml_lex = '/media/jan/Fisk/CJVT/data/dicts_xml_december/slovarji/srbslo_2_kor-annotated.xml'
+    xml_raw = ''
+    xml_lex = ''
+    # output
+    json_out = ''
 
     # structures, count  = get_all_container_structures( xml_lex )
-    container_structure = [['entry'], ['form', 'pos', 'sense'], ['translation']]
+    # # examples of container_structure parameter
+    # container_structure = [['entry'], ['form', 'pos', 'sense'], ['translation']]
     # container_structure = [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
+    # example of approved_structures parameter
+    approved_structures = [
+        [['entry'], ['form', 'pos', 'sense'], ['translation']],
+        [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
+    ]
 
-    # outputs
-    # json_pages = '/media/jan/Fisk/CJVT/outputs/json/irish_pages.json'
-    # json_entries = '/media/jan/Fisk/CJVT/outputs/json/irish_entries.json'
-    # json_senses = '/media/jan/Fisk/CJVT/outputs/json/irish_senses.json'
-    # json_unlabelled = '/media/jan/Fisk/CJVT/outputs/json/irish_unlabeled.json'
-    # json_out = '/media/jan/Fisk/CJVT/outputs/json/mali_sloang_packed_new.json'
-    # json_out = '/media/jan/Fisk/CJVT/outputs/json/sloita_proba5a_packed.json'
-    json_out = '/media/jan/Fisk/CJVT/outputs/json/srbslo_2_kor_packed.json'
-
-    json_d = xml2json( xml_raw, xml_lex, container_structure, json_out )
+    json_d = xml2json( xml_raw, xml_lex, approved_structures, json_out )
 
 
 

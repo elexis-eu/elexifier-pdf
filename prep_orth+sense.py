@@ -17,7 +17,7 @@ for i in range(310):
   else:
     add=test
   try:
-    tree=ET.parse('tokenizer/correct_entries/entry_'+str(i)+'.xml')
+    tree=ET.parse('tokenizer/dictScrap/entry_'+str(i)+'.xml')
   except:
     continue
   root=tree.getroot()
