@@ -419,6 +419,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
 
 
+
 ### The following main stub demonstrates the usage of this script. There are 2 variables to be specified:
 #       - json_in_file: path to .json file containing the dataset prepared by the functions in xml2json_ML.py
 #       - json_out_file: path to .json file into which the results of the ML will be written. Ensure all directories
