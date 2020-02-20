@@ -41,7 +41,7 @@ def construct_containers_map( root, parent_map ):
 
 
 
-def get_container_structure( container, level=0, structure=[] ):
+def get_container_structure( container, level, structure ):
     # Construct a container structure as a list of lists: each list within the structure denotes a level.
     # Recursive function.
 
@@ -241,7 +241,7 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
             continue
 
         # check if current entry structure is faulty
-        structure_cur = get_container_structure( entry_cur )
+        structure_cur = get_container_structure( entry_cur, 0, [] )
         if structure_cur not in approved_structures:
             entries_blacklist.append( entry_cur )
             continue
@@ -402,6 +402,7 @@ if __name__ == "__main__":
     # container_structure = [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
     # example of approved_structures parameter
     approved_structures = [
+        [['entry'], ['form', 'pos', 'translation']],
         [['entry'], ['form', 'pos', 'sense'], ['translation']],
         [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
     ]
