@@ -8,7 +8,7 @@ import argparse
 from datetime import datetime
 from time import time
 import os
-
+import sys
 
 
 
@@ -124,6 +124,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
 
     # data preparation
     # data = json.load( open( data_file, 'r' ) )
+    # have to do two iterations - one 75:25, another 100:0
     n_train = int( round( len( data )*0.75 ) )
     train = data[:n_train]
     test = data[n_train:]
@@ -251,7 +252,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
     data = json.load( open( data_packed_file, 'r' ) )
 
     # train on 1st level data
-    model_pages, pages_infos = train_on_data( data['level_1'], n_rounds=8, verbose=True, logdir=logdir, batch_size=4 )
+    model_pages, pages_infos = train_on_data( data['level_1'], n_rounds=4, verbose=True, logdir=logdir, batch_size=4 )
 
 
     # predict on unlabelled data
@@ -310,7 +311,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # 2.) entries level prediction
     # train on 2nd level data
-    model_entries, entries_infos = train_on_data( data['level_2'], n_rounds=8, verbose=True, logdir=logdir, batch_size=8 )
+    model_entries, entries_infos = train_on_data( data['level_2'], n_rounds=4, verbose=True, logdir=logdir, batch_size=8 )
 
     # prepare new data
     x_new = level2_tokens
@@ -367,7 +368,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # 3.) senses level prediction
     # train on third level data
-    model_senses, senses_infos = train_on_data( data['level_3'], n_rounds=8, verbose=True, logdir=logdir, batch_size=8 )
+    model_senses, senses_infos = train_on_data( data['level_3'], n_rounds=4, verbose=True, logdir=logdir, batch_size=8 )
 
     # prepare new data
     x_new = level3_tokens
@@ -429,9 +430,9 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 if __name__ == "__main__":
 
     # input file path (output of xml2json_ML script)
-    json_in_file = ''
+    json_in_file = sys.argv[1]
     # output file path (input into json2xml_ML script)
-    json_out_file = ''
+    json_out_file = sys.argv[2]
     # log directory path
     logdir = ''
 

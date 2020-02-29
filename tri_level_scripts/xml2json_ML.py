@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 import json
-
+import sys
 
 
 def get_parent_container( e, parent_map ):
@@ -152,7 +152,7 @@ def add_senses_where_missing( tree_lex, entry_level_structure ):
 
 
 
-def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
+def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
     # Prepare a JSON training dataset from a raw .xml and an annotated .xml file, filtering and accepting only container
     # structures that are present in the <approved_structures> parameter. Saves output into <json_out_file>
 
@@ -181,10 +181,11 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
     labels_lvl3 = []
 
     # previous base element for deeper levels
+    # this will probably have to be tracked for everything
     prev_entry = None
     prev_sense = None
 
-    entries_blacklist = []  # blacklist for entries whose structure does not conform to specifications
+    #entries_blacklist = []  # blacklist for entries whose structure does not conform to specifications
 
     page_n = int( tokens_raw[0].attrib['page'] )
     line_n = 0
@@ -222,29 +223,32 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
         while container is not None:
             containers_cur.append( container )
             container = get_parent_container( container, parent_map )
+        #print(token_r.text)
+        #print([e.attrib['name'] for e in containers_cur])
 
         # if token not in any container, label it as scrap and continue
         if len( containers_cur ) == 0:
             feats_lvl1.append( feat )
-            labels_lvl1.append( 'scrap' )
+            labels_lvl1.append( 'noise' )
             continue
 
         # find the base (lowest level) entry container
-        entry_cur = None
-        for cntr in containers_cur:
-            if cntr.attrib['name'] == 'entry' and len( containers_map[cntr] ) == 0:
-                entry_cur = cntr
-                break
+        # commenting out all structure check-up - should have been resolved inside lexonomy
+        #entry_cur = None
+        #for cntr in containers_cur:
+        #    if cntr.attrib['name'] == 'entry' and len( containers_map[cntr] ) == 0:
+        #        entry_cur = cntr
+        #        break
 
         # if entry not found or if current entry was already identified as faulty, continue
-        if entry_cur is None or entry_cur in entries_blacklist:
-            continue
+        #if entry_cur is None or entry_cur in entries_blacklist:
+        #    continue
 
         # check if current entry structure is faulty
-        structure_cur = get_container_structure( entry_cur, 0, [] )
-        if structure_cur not in approved_structures:
-            entries_blacklist.append( entry_cur )
-            continue
+        #structure_cur = get_container_structure( entry_cur, 0, [] )
+        #if structure_cur not in approved_structures:
+        #    entries_blacklist.append( entry_cur )
+        #    continue
 
         # # perform check if container structure is correct:
         # # DEPRECATED: only useful when there is only one possible container_structure
@@ -267,7 +271,7 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
         for cntr in containers_cur:
             cntr_lvl = len( containers_map[cntr] )
             containers_by_lvl[cntr_lvl] = cntr
-
+        print([cntr.attrib['name'] for cntr in containers_by_lvl if cntr!=None])
         # page level labels
         if containers_by_lvl[0] is not None:
 
@@ -290,9 +294,16 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
 
                         # sense level labels
                         if containers_by_lvl[2] is not None:
-                            label_lvl3 = containers_by_lvl[2].attrib['name']
+                            if containers_by_lvl[2].attrib['name'] == 'noise':
+                                label_lvl3 = containers_by_lvl[2].attrib['name']
+                            else:
+                                cntr = containers_by_lvl[2]
+                                if token_a == next( cntr.iter( 'TOKEN' ) ):
+                                    label_lvl3 = containers_by_lvl[2].attrib['name'] + '_start'
+                                else:
+                                    label_lvl3 = containers_by_lvl[2].attrib['name'] + '_inside'
                         else:  # if token has no container beneath sense
-                            label_lvl3 = '0'
+                            label_lvl3 = 'scrap'
 
                         # if this is new sense, write the previous sense and start a new one
                         if sense != prev_sense and prev_sense is not None:
@@ -305,10 +316,17 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
                         prev_sense = sense
 
                     else:   # if level 2 container is not an entry
-                        label_lvl2 = containers_by_lvl[1].attrib['name']
+                        if containers_by_lvl[1].attrib['name'] == 'noise':
+                            label_lvl3 = containers_by_lvl[1].attrib['name']
+                        else:
+                            cntr = containers_by_lvl[1]
+                            if token_a == next( cntr.iter( 'TOKEN' ) ):
+                                label_lvl2 = containers_by_lvl[1].attrib['name'] + '_start'
+                            else:
+                                label_lvl2 = containers_by_lvl[1].attrib['name'] + '_inside'
 
                 else:   # if token has no container beneath entry
-                    label_lvl2 = '0'
+                    label_lvl2 = 'scrap'
 
                 # if this is new entry, write the previous entry and start a new one
                 if entry != prev_entry and prev_entry is not None:
@@ -326,10 +344,9 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
         else:   # if token has no container
 
             label_lvl1 = 'scrap'
-
         feats_lvl1.append( feat )
         labels_lvl1.append( label_lvl1 )
-
+        #print(labels_lvl1)
 
 
     # add all the training data that is not yet added
@@ -391,23 +408,23 @@ def xml2json( xml_raw_file, xml_lex_file, approved_structures, json_out_file ):
 if __name__ == "__main__":
 
     # inputs
-    xml_raw = ''
-    xml_lex = ''
+    xml_raw = sys.argv[1]
+    xml_lex = sys.argv[2]
     # output
-    json_out = ''
+    json_out = sys.argv[3]
 
     # structures, count  = get_all_container_structures( xml_lex )
     # # examples of container_structure parameter
     # container_structure = [['entry'], ['form', 'pos', 'sense'], ['translation']]
     # container_structure = [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
     # example of approved_structures parameter
-    approved_structures = [
-        [['entry'], ['form', 'pos', 'translation']],
-        [['entry'], ['form', 'pos', 'sense'], ['translation']],
-        [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
-    ]
+    #approved_structures = [
+    #    [['entry'], ['form', 'pos', 'translation']],
+    #    [['entry'], ['form', 'pos', 'sense'], ['translation']],
+    #    [['entry'], ['form', 'pos', 'variant', 'sense'], ['translation']]
+    #]
 
-    json_d = xml2json( xml_raw, xml_lex, approved_structures, json_out )
+    json_d = xml2json( xml_raw, xml_lex, json_out )
 
 
 
