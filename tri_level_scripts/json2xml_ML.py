@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 import json
-
+import sys
 
 def json2xml( json_in_file, xml_raw, xml_out_file ):
     # Constructs final .xml file from the output of train_ML script and with tokens from raw .xml file, and output into
@@ -78,7 +78,10 @@ def json2xml( json_in_file, xml_raw, xml_out_file ):
 
         token_labels.append( label_cur )
         i_t_lvl1 += 1
-
+    #print(len(token_labels))
+    #print(len(tokens_raw))
+    added_tokens = 0
+    #print(token_labels[:100])
     # construct XML tree based on labels for each token
     body_elm = ET.Element( 'body' )
     # current elements by level
@@ -95,30 +98,73 @@ def json2xml( json_in_file, xml_raw, xml_out_file ):
         lbl_lvl2 = token_labels[i][1]
         lbl_lvl3 = token_labels[i][2]
 
-        if lbl_lvl1 == 'scrap':
-            if cur_elm_lvl1 is not None and cur_elm_lvl1.tag == 'container' and cur_elm_lvl1.attrib['name'] == 'dictScrap':
+        """
+        if lbl_lvl1 == 'noise':
+            if cur_elm_lvl1 is not None and cur_elm_lvl1.tag == 'container' and cur_elm_lvl1.attrib['name'] == 'noise':
                 cur_elm_lvl1.append( token_r )
                 continue
             else:
-                cur_elm_lvl1 = ET.SubElement( body_elm, 'container', attrib={'name' : 'dictScrap'} )
+                cur_elm_lvl1 = ET.SubElement( body_elm, 'container', attrib={'name' : 'noise'} )
                 cur_elm_lvl1.append( token_r )
                 continue
 
-        elif 'entry' in lbl_lvl1:
-
+        """
+        if 'entry' in lbl_lvl1:
+            
+            # if the lvl1 label is entry_start, or the current lvl1 element is not given (start of the data) or the current lvl1 element is a container, but not an entry, create a new entry container
             if lbl_lvl1 == 'entry_start' or cur_elm_lvl1 is None or (cur_elm_lvl1.tag == 'container' and cur_elm_lvl1.attrib['name'] != 'entry'):
                 cur_elm_lvl1 = ET.SubElement( body_elm, 'container', attrib={'name': 'entry'} )
-
-            if lbl_lvl2 == '0':
+            # if the lvl2 label is scrap or none, just add the token to the lvl1 container and continue to the next token
+            if lbl_lvl2 == 'scrap' or lbl_lvl2 == '':
                 cur_elm_lvl1.append( token_r )
+                added_tokens +=1
                 continue
-
+            # if the lvl2 label is noise, (if the lvl2 container is not noise, open a noise container,) add the token and continue
+            elif lbl_lvl2 == 'noise':
+                if cur_elm_lvl2 is None or (cur_elm_lvl2.tag == 'container' and cur_elm_lvl2.attrib['name'] != 'noise'):
+                    cur_elm_lvl2 = ET.SubElement( cur_elm_lvl1, 'container', attrib={'name': 'noise'} )
+                cur_elm_lvl2.append( token_r )
+                added_tokens +=1
+                continue
+            else:
+                # if there is a start label on the lvl2, open the new container
+                # we go deeper only if this is a start tag, otherwise we disregard level 3 - might be a problem :-D
+                if lbl_lvl2.endswith('_start'):
+                    cur_elm_lvl2 = ET.SubElement( cur_elm_lvl1, 'container', attrib={'name': lbl_lvl2.split('_')[0]} )
+                    # if the label is scrap or none, just add the token and continue
+                else:
+                    if labels_prev[1].split('_')[0] != lbl_lvl2.split('_')[0] or cur_elm_lvl2 is None:
+                        cur_elm_lvl2 = ET.SubElement( cur_elm_lvl1, 'container', attrib={'name': lbl_lvl2.split('_')[0]} )
+                if lbl_lvl3 == 'scrap' or lbl_lvl3 == '':
+                    cur_elm_lvl2.append( token_r )
+                    added_tokens += 1
+                    continue
+                else:
+                    if lbl_lvl3 == 'noise':
+                        if cur_elm_lvl3 is None or (cur_elm_lvl3.tag == 'container' and cur_elm_lvl3.attrib['name'] != 'noise'):
+                            cur_elm_lvl3 = ET.SubElement( cur_elm_lvl2, 'container', attrib={'name': 'noise'} )
+                        cur_elm_lvl3.append( token_r )
+                        added_tokens +=1
+                        continue
+                    else:
+                        if lbl_lvl3.endswith('_start'):
+                            cur_elm_lvl3 = ET.SubElement( cur_elm_lvl2, 'container', attrib={'name': lbl_lvl3.split('_')[0]} )
+                            cur_elm_lvl3.append( token_r )
+                            added_tokens +=1
+                            continue
+                        else:
+                            if labels_prev[2].split('_')[0] != lbl_lvl3.split('_')[0] or cur_elm_lvl3 is None:
+                                cur_elm_lvl3 = ET.SubElement( cur_elm_lvl2, 'container', attrib={'name': lbl_lvl3.split('_')[0]} )
+                            cur_elm_lvl3.append( token_r )
+                            added_tokens += 1
+                            continue
+            """
             elif 'sense' in lbl_lvl2:
 
                 if lbl_lvl2 == 'sense_start' or cur_elm_lvl2 is None or (cur_elm_lvl2.tag == 'container' and cur_elm_lvl2.attrib['name'] != 'sense'):
                     cur_elm_lvl2 = ET.SubElement( cur_elm_lvl1, 'container', attrib={'name': 'sense'} )
 
-                if lbl_lvl3 == '0':
+                if lbl_lvl3 == 'scrap':
                     cur_elm_lvl2.append( token_r )
                     continue
                 else:
@@ -131,11 +177,14 @@ def json2xml( json_in_file, xml_raw, xml_out_file ):
                     cur_elm_lvl2 = ET.SubElement( cur_elm_lvl1, 'container', attrib={'name': lbl_lvl2} )
                 cur_elm_lvl2.append( token_r )
                 continue
-
+            """
         else:   # in case there is another level 1 container that is not entry or dictScrap
-            if labels_prev[0] != lbl_lvl1 or cur_elm_lvl1 is None:
+            if labels_prev[0].split('_')[0] != lbl_lvl1.split('_')[0] or cur_elm_lvl1 is None:
                 cur_elm_lvl1 = ET.SubElement( body_elm, 'container', attrib={'name': lbl_lvl1} )
             cur_elm_lvl1.append( token_r )
+            added_tokens +=1
+        
+    #print(added_tokens)
 
 
     # saved the constructed XML tree into the output .xml file
@@ -159,12 +208,13 @@ def json2xml( json_in_file, xml_raw, xml_out_file ):
 if __name__ == "__main__":
 
     # input (output from train_ML script)
-    json_ml_results_file = ''
+    json_ml_results_file = sys.argv[1]
+
     # input (raw .xml file path)
-    xml_raw_file = ''
+    xml_raw_file = sys.argv[2]
 
     # output file path
-    xml_out_file = ''
+    xml_out_file = sys.argv[3]
 
     xml_str = json2xml( json_ml_results_file, xml_raw_file, xml_out_file )
 
