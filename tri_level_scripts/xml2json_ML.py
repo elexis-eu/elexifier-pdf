@@ -271,7 +271,7 @@ def xml2json( xml_raw_file, xml_lex_file, json_out_file ):
         for cntr in containers_cur:
             cntr_lvl = len( containers_map[cntr] )
             containers_by_lvl[cntr_lvl] = cntr
-        print([cntr.attrib['name'] for cntr in containers_by_lvl if cntr!=None])
+        #print([cntr.attrib['name'] for cntr in containers_by_lvl if cntr!=None])
         # page level labels
         if containers_by_lvl[0] is not None:
 

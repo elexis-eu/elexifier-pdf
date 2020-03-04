@@ -133,17 +133,21 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     y_train = [e[1] for e in train]
     x_test = [e[0] for e in test]
     y_test = [e[1] for e in test]
-
+    x = [e[0] for e in data]
+    y= [e[1] for e in data]
+    
     all_tokens, idx_t, idx_c = extract_tokens( x_train )
     x_train_oh, x_train_chars, idx = one_hot_and_chars( x_train, idx_c=idx_c )
     x_test_oh, x_test_chars, _ = one_hot_and_chars( x_test, idx, idx_c )
+    x_oh, x_chars, _ = one_hot_and_chars( x, idx, idx_c)
 
     max_sequence_len = max( [len(e) for e in x_train_oh] )*2
     x_train_oh = sequence.pad_sequences( x_train_oh, max_sequence_len )
     x_test_oh = sequence.pad_sequences( x_test_oh, max_sequence_len )
+    x_oh = sequence.pad_sequences( x_oh, max_sequence_len )
 
     max_carray_len = 0
-    for seq in x_train_chars:
+    for seq in x_chars:
         max_cur = max( [len(arr) for arr in seq] )
         if max_cur > max_carray_len:
             max_carray_len = max_cur
@@ -155,11 +159,17 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     x_test_chars = sequence.pad_sequences( x_test_chars_pad, max_sequence_len )
     X_train = [x_train_oh, x_train_chars]
     X_test = [x_test_oh, x_test_chars]
+    x_chars_pad = [sequence.pad_sequences( seq, max_carray_len ) for seq in x_chars]
+    x_chars = sequence.pad_sequences( x_chars_pad, max_sequence_len )
+    X = [x_oh, x_chars]
 
     y_train_oh, idx_label = one_hot_target( y_train )
     y_test_oh, _ = one_hot_target( y_test, idx_label )
     y_train_oh = sequence.pad_sequences( y_train_oh, max_sequence_len )
     y_test_oh = sequence.pad_sequences( y_test_oh, max_sequence_len )
+    y_oh, _ = one_hot_target( y, idx_label )
+    y_oh = sequence.pad_sequences( y_oh, max_sequence_len )
+    
     rev_idx_label = {v:k for k, v in idx_label.items()}
 
     data_infos = {'idx': idx,
@@ -176,13 +186,17 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     # best_acc = 0
     # best_model_path = 'best_models/best_model_' + dt + '.h5'
 
+    report=''
     t1 = time()
     for i_round in range(n_rounds):
 
         if verbose: print('ROUND', i_round)
         t_r0 = time()
 
-        h = model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
+        if i_round==0:
+            h = model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
+        else:
+            h = model.fit( X, y_oh, batch_size=batch_size, epochs=10, shuffle=True )
 
         # # possible best model saving mechanism.
         # score, acc = model.evaluate( X_test, y_test_oh, batch_size=5 )
@@ -191,7 +205,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
         #     best_acc = acc
         #     model.save_weights( best_model_path )
 
-        if verbose:
+        if i_round == 0:#verbose:
             y_test_pred = model.predict( X_test )
 
             def to_tags(sequence):
@@ -225,8 +239,10 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
                 pred.extend(to_tags(p[i:]))
                 true.extend(to_tags(t[i:]))
 
-            print(confusion_matrix(true,pred))
-            print(classification_report(true,pred))
+            report+=str(confusion_matrix(true,pred))+'\n'
+            report+=str(classification_report(true,pred))+'\n'
+            report+='Approximate running time '+str((time()-t_r0)*4)+'\n'
+            print(report)
             print("Accuracy:", accuracy_score(true,pred))
             print("ROUND time:", (time()-t_r0), "s")
             print("")
@@ -242,7 +258,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     # in the end load the model with the best score (if saving best models)
     # model.load_weights( best_model_path )
     if verbose: print("Training time:", (time()-t1), "s")
-    return model, data_infos
+    return model, data_infos, report
 
 
 
@@ -252,7 +268,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
     data = json.load( open( data_packed_file, 'r' ) )
 
     # train on 1st level data
-    model_pages, pages_infos = train_on_data( data['level_1'], n_rounds=4, verbose=True, logdir=logdir, batch_size=4 )
+    model_pages, pages_infos, report1 = train_on_data( data['level_1'], n_rounds=4, verbose=True, logdir=logdir, batch_size=4 )
 
 
     # predict on unlabelled data
@@ -311,7 +327,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # 2.) entries level prediction
     # train on 2nd level data
-    model_entries, entries_infos = train_on_data( data['level_2'], n_rounds=4, verbose=True, logdir=logdir, batch_size=8 )
+    model_entries, entries_infos, report2 = train_on_data( data['level_2'], n_rounds=4, verbose=True, logdir=logdir, batch_size=8 )
 
     # prepare new data
     x_new = level2_tokens
@@ -345,7 +361,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
             if i_t_pad < entries_infos['max_sequence_len']:
                 label_cur = rev_idx_label_entries[np.argmax( y_pred_entries[i_e][i_t_pad] )]
             else:
-                label_cur = '0'
+                label_cur = entry_labels[-1] # this is probably the reason for "0" labels at some points?
 
             entry_labels.append( label_cur )
 
@@ -368,7 +384,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # 3.) senses level prediction
     # train on third level data
-    model_senses, senses_infos = train_on_data( data['level_3'], n_rounds=4, verbose=True, logdir=logdir, batch_size=8 )
+    model_senses, senses_infos, report3 = train_on_data( data['level_3'], n_rounds=4, verbose=True, logdir=logdir, batch_size=8 )
 
     # prepare new data
     x_new = level3_tokens
@@ -400,7 +416,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
             if i_t_pad < senses_infos['max_sequence_len']:
                 label_cur = rev_idx_label_senses[np.argmax( y_pred_senses[i_s][i_t_pad] )]
             else:
-                label_cur = '0'
+                label_cur = sense_labels[-1] # this is probably the reason for "0" labels at some points?
             sense_labels.append( label_cur )
 
         level3_labels.append( sense_labels )
@@ -414,7 +430,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     json.dump( json_data, open( json_out_file, 'w' ), indent=4 )
 
-    return json_data
+    return json_data, "LEVEL 1\n\n"+report1+"\n\nLEVEL 2\n\n"+report2+"\n\nLEVEL 3\n\n"+report3
 
 
 
@@ -436,7 +452,8 @@ if __name__ == "__main__":
     # log directory path
     logdir = ''
 
-    jdata = train_ML( json_in_file, json_out_file, logdir )
+    jdata, report = train_ML( json_in_file, json_out_file, logdir )
+    open('report.temp','w').write(report)
 
 
 
