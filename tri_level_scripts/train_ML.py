@@ -128,22 +128,29 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     n_train = int( round( len( data )*0.75 ) )
     train = data[:n_train]
     test = data[n_train:]
+    #print len(train),len(test)
+    #print data
 
-    x_train = [e[0] for e in train]
-    y_train = [e[1] for e in train]
-    x_test = [e[0] for e in test]
-    y_test = [e[1] for e in test]
+    if len(test) > 5:
+        x_train = [e[0] for e in train]
+        y_train = [e[1] for e in train]
+        x_test = [e[0] for e in test]
+        y_test = [e[1] for e in test]
     x = [e[0] for e in data]
-    y= [e[1] for e in data]
+    y = [e[1] for e in data]
     
-    all_tokens, idx_t, idx_c = extract_tokens( x_train )
-    x_train_oh, x_train_chars, idx = one_hot_and_chars( x_train, idx_c=idx_c )
-    x_test_oh, x_test_chars, _ = one_hot_and_chars( x_test, idx, idx_c )
-    x_oh, x_chars, _ = one_hot_and_chars( x, idx, idx_c)
+    all_tokens, idx_t, idx_c = extract_tokens( x )
+    if len(test) > 5:
+        x_train_oh, x_train_chars, idx = one_hot_and_chars( x_train, idx_c=idx_c )
+        x_test_oh, x_test_chars, _ = one_hot_and_chars( x_test, idx, idx_c )
+        x_oh, x_chars, _ = one_hot_and_chars( x, idx, idx_c)
+    else:
+        x_oh, x_chars, idx = one_hot_and_chars( x, idx_c=idx_c)
 
-    max_sequence_len = max( [len(e) for e in x_oh] )*2
-    x_train_oh = sequence.pad_sequences( x_train_oh, max_sequence_len )
-    x_test_oh = sequence.pad_sequences( x_test_oh, max_sequence_len )
+    max_sequence_len = max( [len(e) for e in x_oh] )*3
+    if len(test) > 5:
+        x_train_oh = sequence.pad_sequences( x_train_oh, max_sequence_len )
+        x_test_oh = sequence.pad_sequences( x_test_oh, max_sequence_len )
     x_oh = sequence.pad_sequences( x_oh, max_sequence_len )
 
     max_carray_len = 0
@@ -153,22 +160,27 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
             max_carray_len = max_cur
     max_carray_len *= 2
 
-    x_train_chars_pad = [sequence.pad_sequences( seq, max_carray_len ) for seq in x_train_chars]
-    x_train_chars = sequence.pad_sequences( x_train_chars_pad, max_sequence_len )
-    x_test_chars_pad = [sequence.pad_sequences( seq, max_carray_len ) for seq in x_test_chars]
-    x_test_chars = sequence.pad_sequences( x_test_chars_pad, max_sequence_len )
-    X_train = [x_train_oh, x_train_chars]
-    X_test = [x_test_oh, x_test_chars]
+    if len(test) > 5:
+        x_train_chars_pad = [sequence.pad_sequences( seq, max_carray_len ) for seq in x_train_chars]
+        x_train_chars = sequence.pad_sequences( x_train_chars_pad, max_sequence_len )
+        x_test_chars_pad = [sequence.pad_sequences( seq, max_carray_len ) for seq in x_test_chars]
+        x_test_chars = sequence.pad_sequences( x_test_chars_pad, max_sequence_len )
+        X_train = [x_train_oh, x_train_chars]
+        X_test = [x_test_oh, x_test_chars]
     x_chars_pad = [sequence.pad_sequences( seq, max_carray_len ) for seq in x_chars]
     x_chars = sequence.pad_sequences( x_chars_pad, max_sequence_len )
     X = [x_oh, x_chars]
 
-    y_train_oh, idx_label = one_hot_target( y_train )
-    y_test_oh, _ = one_hot_target( y_test, idx_label )
-    y_train_oh = sequence.pad_sequences( y_train_oh, max_sequence_len )
-    y_test_oh = sequence.pad_sequences( y_test_oh, max_sequence_len )
-    y_oh, _ = one_hot_target( y, idx_label )
-    y_oh = sequence.pad_sequences( y_oh, max_sequence_len )
+    if len(test) > 5:
+        y_train_oh, idx_label = one_hot_target( y_train )
+        y_test_oh, _ = one_hot_target( y_test, idx_label )
+        y_train_oh = sequence.pad_sequences( y_train_oh, max_sequence_len )
+        y_test_oh = sequence.pad_sequences( y_test_oh, max_sequence_len )
+        y_oh, _ = one_hot_target( y, idx_label )
+        y_oh = sequence.pad_sequences( y_oh, max_sequence_len )
+    else:
+         y_oh, idx_label = one_hot_target( y )
+         y_oh = sequence.pad_sequences( y_oh, max_sequence_len )
     
     rev_idx_label = {v:k for k, v in idx_label.items()}
 
@@ -189,11 +201,11 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     report=''
     t1 = time()
     for i_round in range(n_rounds):
-        if i_round==0 and len(x_test_oh)==0:
+        if i_round==0 and len(test)<=5:
             continue
         if verbose: print('ROUND', i_round)
         t_r0 = time()
-
+        #print y_oh
         if i_round==0:
             h = model.fit( X_train, y_train_oh, batch_size=batch_size, epochs=10, validation_data=(X_test, y_test_oh), shuffle=True )
         else:
@@ -303,8 +315,12 @@ def train_ML( data_packed_file, json_out_file, logdir ):
             if n_tokens_in <= pages_infos['max_sequence_len']:
                 i_t_pad = i_t + pages_infos['max_sequence_len'] - n_tokens_in
             else:
-                i_t_pad = i_t
-
+                #what to do with far too long instances? esp. if just parts of pages are annotated
+                page_labels.append( label_cur )
+                continue
+                #i_t_pad = i_t
+            #print y_pred_pages.shape,i_p,i_t_pad
+            #print y_pred_pages[i_p][i_t_pad]
             token_cur = level1_tokens[i_p][i_t]
             label_cur = rev_idx_label_pages[np.argmax( y_pred_pages[i_p][i_t_pad] )]
             page_labels.append( label_cur )
@@ -385,27 +401,35 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # 3.) senses level prediction
     # train on third level data
-    model_senses, senses_infos, report3 = train_on_data( data['level_3'], n_rounds=4, verbose=True, logdir=logdir, batch_size=8 )
+    if len( data['level_3'][0][0] ) > 0:
+        
+        model_senses, senses_infos, report3 = train_on_data( data['level_3'], n_rounds=4, verbose=True, logdir=logdir, batch_size=8 )
 
-    # prepare new data
-    x_new = level3_tokens
-    x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, senses_infos['idx'], senses_infos['idx_c'] )
-    x_new_oh = sequence.pad_sequences( x_new_oh, senses_infos['max_sequence_len'] )
-    x_new_chars_pad = [sequence.pad_sequences( seq, senses_infos['max_carray_len'] ) for seq in x_new_chars]
-    x_new_chars = sequence.pad_sequences( x_new_chars_pad, senses_infos['max_sequence_len'] )
-    X_new = [x_new_oh, x_new_chars]
-    rev_idx_label_senses = {v: k for k, v in senses_infos['idx_label'].items()}
+        # prepare new data
+        x_new = level3_tokens
+        x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, senses_infos['idx'], senses_infos['idx_c'] )
+        x_new_oh = sequence.pad_sequences( x_new_oh, senses_infos['max_sequence_len'] )
+        x_new_chars_pad = [sequence.pad_sequences( seq, senses_infos['max_carray_len'] ) for seq in x_new_chars]
+        x_new_chars = sequence.pad_sequences( x_new_chars_pad, senses_infos['max_sequence_len'] )
+        X_new = [x_new_oh, x_new_chars]
+        rev_idx_label_senses = {v: k for k, v in senses_infos['idx_label'].items()}
 
-    # predict
-    y_pred_senses = model_senses.predict( X_new )
+        # predict
+        y_pred_senses = model_senses.predict( X_new )
+
+    else:
+        report3='no annotations given'
 
     # get 3rd level labels
     level3_labels = []
     for i_s in range( len( level3_tokens ) ):
-
         n_tokens_in = len( level3_tokens[i_s] )
         sense_labels = []
         for i_t in range( n_tokens_in ):
+            # hacky way of resolving the situation where there is no level3 training data
+            if len( data['level_3'][0][0] ) == 0:
+                sense_labels.append('scrap')
+                continue
 
             # take care of correct indices with regard to padding and max_sequence_len
             if n_tokens_in <= senses_infos['max_sequence_len']:
