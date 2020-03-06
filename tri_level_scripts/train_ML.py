@@ -141,7 +141,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     x_test_oh, x_test_chars, _ = one_hot_and_chars( x_test, idx, idx_c )
     x_oh, x_chars, _ = one_hot_and_chars( x, idx, idx_c)
 
-    max_sequence_len = max( [len(e) for e in x_train_oh] )*2
+    max_sequence_len = max( [len(e) for e in x_oh] )*2
     x_train_oh = sequence.pad_sequences( x_train_oh, max_sequence_len )
     x_test_oh = sequence.pad_sequences( x_test_oh, max_sequence_len )
     x_oh = sequence.pad_sequences( x_oh, max_sequence_len )
@@ -189,7 +189,8 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     report=''
     t1 = time()
     for i_round in range(n_rounds):
-
+        if i_round==0 and len(x_test_oh)==0:
+            continue
         if verbose: print('ROUND', i_round)
         t_r0 = time()
 
@@ -427,7 +428,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
                  'level_2': (level2_tokens, level2_labels),
                  'level_3': (level3_tokens, level3_labels)
                 }
-
+ 
     json.dump( json_data, open( json_out_file, 'w' ), indent=4 )
 
     return json_data, "LEVEL 1\n\n"+report1+"\n\nLEVEL 2\n\n"+report2+"\n\nLEVEL 3\n\n"+report3
