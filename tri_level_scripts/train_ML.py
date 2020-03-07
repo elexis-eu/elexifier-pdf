@@ -141,8 +141,8 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
         # check that all labels from test are present in train, else discard test data
         train_labels = set([f for e in y_train for f in e])
         test_labels = set([f for e in y_test for f in e])
-        print train_labels
-        print test_labels
+        #print train_labels
+        #print test_labels
         if len(train_labels)<len(train_labels.union(test_labels)):
             test=[]
 
