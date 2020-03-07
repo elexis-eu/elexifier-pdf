@@ -130,17 +130,27 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     test = data[n_train:]
     #print len(train),len(test)
     #print data
-
-    if len(test) > 5:
+    #print [e[1] for e in test]
+    #print sum([len(e[1]) for e in test])
+    if sum([len(e[1]) for e in test]) > 100:
         x_train = [e[0] for e in train]
         y_train = [e[1] for e in train]
         x_test = [e[0] for e in test]
         y_test = [e[1] for e in test]
+
+        # check that all labels from test are present in train, else discard test data
+        train_labels = set([f for e in y_train for f in e])
+        test_labels = set([f for e in y_test for f in e])
+        print train_labels
+        print test_labels
+        if len(train_labels)<len(train_labels.union(test_labels)):
+            test=[]
+
     x = [e[0] for e in data]
     y = [e[1] for e in data]
     
     all_tokens, idx_t, idx_c = extract_tokens( x )
-    if len(test) > 5:
+    if sum([len(e[1]) for e in test]) > 100:
         x_train_oh, x_train_chars, idx = one_hot_and_chars( x_train, idx_c=idx_c )
         x_test_oh, x_test_chars, _ = one_hot_and_chars( x_test, idx, idx_c )
         x_oh, x_chars, _ = one_hot_and_chars( x, idx, idx_c)
@@ -148,7 +158,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
         x_oh, x_chars, idx = one_hot_and_chars( x, idx_c=idx_c)
 
     max_sequence_len = max( [len(e) for e in x_oh] )*3
-    if len(test) > 5:
+    if sum([len(e[1]) for e in test]) > 100:
         x_train_oh = sequence.pad_sequences( x_train_oh, max_sequence_len )
         x_test_oh = sequence.pad_sequences( x_test_oh, max_sequence_len )
     x_oh = sequence.pad_sequences( x_oh, max_sequence_len )
@@ -160,7 +170,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
             max_carray_len = max_cur
     max_carray_len *= 2
 
-    if len(test) > 5:
+    if sum([len(e[1]) for e in test]) > 100:
         x_train_chars_pad = [sequence.pad_sequences( seq, max_carray_len ) for seq in x_train_chars]
         x_train_chars = sequence.pad_sequences( x_train_chars_pad, max_sequence_len )
         x_test_chars_pad = [sequence.pad_sequences( seq, max_carray_len ) for seq in x_test_chars]
@@ -171,7 +181,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     x_chars = sequence.pad_sequences( x_chars_pad, max_sequence_len )
     X = [x_oh, x_chars]
 
-    if len(test) > 5:
+    if sum([len(e[1]) for e in test]) > 100:
         y_train_oh, idx_label = one_hot_target( y_train )
         y_test_oh, _ = one_hot_target( y_test, idx_label )
         y_train_oh = sequence.pad_sequences( y_train_oh, max_sequence_len )
@@ -201,7 +211,7 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     report=''
     t1 = time()
     for i_round in range(n_rounds):
-        if i_round==0 and len(test)<=5:
+        if i_round==0 and (sum([len(e[1]) for e in test]) <= 100 or len(y_test_oh)==0):
             continue
         if verbose: print('ROUND', i_round)
         t_r0 = time()
