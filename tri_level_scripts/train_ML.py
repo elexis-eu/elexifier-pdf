@@ -112,7 +112,7 @@ def model_cLSTM( input_shape_feat, input_shape_char, output_len, dropout=0.4, ve
 
 
 
-def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
+def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5, max_sequence_len=None ):
     # prepares training and testing data, then trains the model for <n_rounds>.
 
     dt = datetime.now().strftime( "%Y%m%d-%H%M%S" )
@@ -157,7 +157,9 @@ def train_on_data( data, n_rounds=10, verbose=True, logdir="", batch_size=5 ):
     else:
         x_oh, x_chars, idx = one_hot_and_chars( x, idx_c=idx_c)
 
-    max_sequence_len = max( [len(e) for e in x_oh] )*3
+    if max_sequence_len==None:
+        max_sequence_len = max( [len(e) for e in x_oh] )*2
+    
     if sum([len(e[1]) for e in test]) > 100:
         x_train_oh = sequence.pad_sequences( x_train_oh, max_sequence_len )
         x_test_oh = sequence.pad_sequences( x_test_oh, max_sequence_len )
@@ -289,9 +291,10 @@ def train_ML( data_packed_file, json_out_file, logdir ):
     # main method that takes care of training and prediction on all three levels.
 
     data = json.load( open( data_packed_file, 'r' ) )
-
+    
+    msl=max([len(e) for e in data['unlabelled']])
     # train on 1st level data
-    model_pages, pages_infos, report1 = train_on_data( data['level_1'], n_rounds=4, verbose=True, logdir=logdir, batch_size=4 )
+    model_pages, pages_infos, report1 = train_on_data( data['level_1'], n_rounds=4, verbose=True, logdir=logdir, batch_size=4, max_sequence_len=msl )
 
 
     # predict on unlabelled data
@@ -299,6 +302,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
     # 1.) pages level prediction
     # prepare new data
     level1_tokens = data['unlabelled']
+    print len(level1_tokens)
     x_new = level1_tokens
     x_new_oh, x_new_chars, _ = one_hot_and_chars( x_new, pages_infos['idx'], pages_infos['idx_c'] )
     x_new_oh = sequence.pad_sequences( x_new_oh, pages_infos['max_sequence_len'] )
@@ -309,7 +313,8 @@ def train_ML( data_packed_file, json_out_file, logdir ):
 
     # predict
     y_pred_pages = model_pages.predict( X_new )
-
+    print y_pred_pages.shape
+    print pages_infos['max_sequence_len']
     # get 1st level labels and prepare 2nd level data based on predictions
     level1_labels = []
     level2_tokens = []
@@ -326,14 +331,15 @@ def train_ML( data_packed_file, json_out_file, logdir ):
                 i_t_pad = i_t + pages_infos['max_sequence_len'] - n_tokens_in
             else:
                 #what to do with far too long instances? esp. if just parts of pages are annotated
-                page_labels.append( label_cur )
-                continue
-                #i_t_pad = i_t
+                #page_labels.append( label_cur )
+                #continue
+                i_t_pad = i_t
             #print y_pred_pages.shape,i_p,i_t_pad
             #print y_pred_pages[i_p][i_t_pad]
             token_cur = level1_tokens[i_p][i_t]
             label_cur = rev_idx_label_pages[np.argmax( y_pred_pages[i_p][i_t_pad] )]
             page_labels.append( label_cur )
+            
 
             if label_cur == 'scrap':
                 continue
@@ -345,7 +351,7 @@ def train_ML( data_packed_file, json_out_file, logdir ):
                 entry = []
 
             entry.append( token_cur )
-
+        
         level1_labels.append( page_labels )
 
     if len( entry ) != 0:
